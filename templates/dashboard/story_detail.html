@@ -18,6 +18,9 @@ Dashboard - {{ story.story_text }}
 <h3>{{ story.story_title }}</h3>
 <p>{{ story.story_text }}</p>
 
+<p><a href="{{ story.get_delete_url }}">Delete</a>| <a href="">Update</a></p>
+<p><a href="">Create Question for this Story</a></p>
+
 
 {% endif %}
 

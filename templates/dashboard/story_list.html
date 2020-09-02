@@ -18,7 +18,8 @@ Dashboard - Stories
 {% if stories %}
 
 {% for story in stories %}
-<p><a href="{{ story.get_absolute_url }}">{{ story.story_title }}</a> | <a href="">Delete</a> | <a href="">Update</a>
+<p><a href="{{ story.get_absolute_url }}">{{ story.story_title }}</a> | <a href="{{ story.get_delete_url }}">Delete</a>
+    | <a href="">Update</a>
 </p>
 {% endfor %}
 
