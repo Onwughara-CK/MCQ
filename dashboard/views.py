@@ -44,7 +44,6 @@ class StoryDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.Dele
     success_message = 'Successfully Deleted Quiz'
     context_object_name = 'story'
 
-
     def test_func(self):
         user = self.request.user
         if not user.teacher:
@@ -54,3 +53,15 @@ class StoryDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.Dele
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+
+class StoryUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, generic.edit.UpdateView):
+    model = models.Story
+    fields = '__all__'
+    success_message = 'Successfully Updated Post'
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
