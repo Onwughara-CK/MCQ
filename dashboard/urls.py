@@ -16,5 +16,5 @@ urlpatterns = [
          views.StoryDeleteView.as_view(), name='story-delete'),
     path('story/<int:pk>/update/',
          views.StoryUpdateView.as_view(), name='story-update'),
-    # path('story/create/', views.StoryCreateView.as_view(), name='story-create'),
+    path('story/create/', views.StoryCreateView.as_view(), name='story-create'),
 ]

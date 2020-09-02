@@ -13,7 +13,7 @@ Dashboard - Stories
 
 {% block content %}
 
-<p><a href="">Add Story</a></p>
+<p><a href="{% url 'dash:story-create' %}">Add Story</a></p>
 
 {% if stories %}
 

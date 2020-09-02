@@ -41,7 +41,7 @@ class StoryDetailView(LoginRequiredMixin, generic.DetailView):
 class StoryDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.DeleteView):
     model = models.Story
     success_url = reverse_lazy('dash:story-list')
-    success_message = 'Successfully Deleted Quiz'
+    success_message = 'Successfully Deleted Story'
     context_object_name = 'story'
 
     def test_func(self):
@@ -58,10 +58,16 @@ class StoryDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.Dele
 class StoryUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, generic.edit.UpdateView):
     model = models.Story
     fields = '__all__'
-    success_message = 'Successfully Updated Post'
+    success_message = 'Successfully Updated Story'
 
     def test_func(self):
         user = self.request.user
         if not user.teacher:
             raise PermissionDenied
         return True
+
+
+class StoryCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.edit.CreateView):
+    model = models.Story
+    fields = '__all__'
+    success_message = 'Successfully created Story'
