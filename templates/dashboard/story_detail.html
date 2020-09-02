@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - {{ story.story_text }}
+{% endblock title %}
+
+
+{% block page_title %}
+<h2>Dashboard</h2>
+{% endblock page_title %}
+
+
+{% block content %}
+
+{% if story %}
+
+
+<h3>{{ story.story_title }}</h3>
+<p>{{ story.story_text }}</p>
+
+
+{% endif %}
+
+{% endblock content %}

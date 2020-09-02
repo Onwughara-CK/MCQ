@@ -7,15 +7,19 @@ Dashboard - Stories
 
 {% block page_title %}
 <h2>Dashboard</h2>
+
 {% endblock page_title %}
 
 
 {% block content %}
 
+<p><a href="">Add Story</a></p>
+
 {% if stories %}
 
 {% for story in stories %}
-<p><a href="{{ story.get_absolute_url }}"></a>{{ story.story_title }}</p>
+<p><a href="{{ story.get_absolute_url }}">{{ story.story_title }}</a> | <a href="">Delete</a> | <a href="">Update</a>
+</p>
 {% endfor %}
 
 {% endif %}

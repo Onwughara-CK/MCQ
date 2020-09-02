@@ -12,6 +12,19 @@
 </head>
 
 <body>
+    <h3>
+        {% if user.is_authenticated %}
+        <a href="#">
+            Take Test |
+        </a>
+        <a href="{% url 'dash:dashboard' %}">
+            Admin DashBoard |
+        </a>
+        <a href="{% url 'users:logout' %}">
+            Logout
+        </a>
+        {%  endif %}
+    </h3>
 
 
     {% block page_title %}

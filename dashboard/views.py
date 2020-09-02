@@ -30,3 +30,9 @@ class StoryListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
         if not user.teacher:
             raise PermissionDenied
         return True
+
+class StoryDetailView(LoginRequiredMixin, generic.DetailView):
+    model = models.Story
+    template_name = "dashboard/story_detail.html"
+    context_object_name = 'story'
+
