@@ -7,7 +7,7 @@ from . import views
 app_name = 'users'
 
 urlpatterns = [
-    # index
+    # static html
     path('', views.IndexView.as_view(), name='home'),
 
     # login

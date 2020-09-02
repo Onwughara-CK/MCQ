@@ -8,18 +8,26 @@ Welcome
 {% block content %}
 <div>
     <div>
-        <h3>Admin | Student</h3>
-        <p>
+        <h3>
+            {% if user.is_authenticated %}
+            <a href="#">
+                Take Test |
+            </a>
+            <a href="{% url 'users:logout' %}">
+                Logout |
+            </a>
+            <a href="{% url 'dash:dashboard' %}">
+                Admin
+            </a>
+            {% else %}
             <a href="{% url 'users:login' %}">
                 Login
-            </a> |
-            <a href="#">
-                Take Test
             </a> |
             <a href="{% url 'users:register' %}">
                 Register
             </a>
-        </p>
+            {% endif %}
+        </h3>
     </div>
 </div>
 {% endblock content %}
