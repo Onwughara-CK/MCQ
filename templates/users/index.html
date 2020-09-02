@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Welcome
+{% endblock title %}
+
+
+{% block content %}
+<div>
+    <div>
+        <h3>Admin | Student</h3>
+        <p>
+            <a href="{% url 'users:login' %}">
+                Login
+            </a> |
+            <a href="#">
+                Take Test
+            </a> |
+            <a href="{% url 'users:register' %}">
+                Register
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock content %}
