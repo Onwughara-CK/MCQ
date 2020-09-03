@@ -34,10 +34,16 @@ class StoryListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
 ##### STORY #####
 
 
-class StoryDetailView(LoginRequiredMixin, generic.DetailView):
+class StoryDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
     model = models.Story
     template_name = "dashboard/story_detail.html"
     context_object_name = 'story'
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
 
 
 class StoryDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.DeleteView):
@@ -124,7 +130,39 @@ class QuestionUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessage
         return True
 
 
-# class StoryCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.edit.CreateView):
-#     model = models.Story
-#     fields = '__all__'
-#     success_message = 'Successfully created Story'
+class QuestionCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.edit.CreateView):
+    model = models.Question
+    fields = '__all__'
+    success_message = 'Successfully created Question'
+
+
+### STORY QUESTION ###
+
+class StoryQuestionCreateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, generic.edit.CreateView):
+    model = models.Question
+    fields = ('question_text',)
+    success_message = 'Successfully created Question'
+
+    def form_valid(self, form):
+        form.instance.story = models.Story.objects.get(pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
+
+
+class StoryQuestionsListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
+    template_name = "dashboard/question_list.html"
+    context_object_name = 'questions'
+
+    def get_queryset(self):
+        return models.Story.objects.get(pk=self.kwargs['pk']).questions.all()
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True

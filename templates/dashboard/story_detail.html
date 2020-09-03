@@ -19,7 +19,9 @@ Dashboard - {{ story.story_title }}
 <p>{{ story.story_text }}</p>
 
 <p><a href="{{ story.get_delete_url }}">Delete</a>| <a href="{{ story.get_update_url }}">Update</a></p>
-<p><a href="">See all Questions for this Story</a> | <a href="">Create Question for this Story</a></p>
+<p><a href="{% url 'dash:story-questions' story.pk %}">See all Questions for this Story</a> | <a
+        href="{% url 'dash:story-question-create' story.pk %}">Create
+        Question for this Story</a></p>
 
 {% endif %}
 

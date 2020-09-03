@@ -19,7 +19,8 @@ Dashboard - Stories
 
 {% for story in stories %}
 <p><a href="{{ story.get_absolute_url }}">{{ story.story_title }}</a> | <a href="{{ story.get_delete_url }}">Delete</a>
-    | <a href="{{ story.get_update_url }}">Update</a>
+    | <a href="{{ story.get_update_url }}">Update</a> | <a
+        href="{% url 'dash:story-questions' story.pk %}">({{ story.questions.count }})</a>
 </p>
 {% endfor %}
 

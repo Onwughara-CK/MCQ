@@ -54,5 +54,11 @@ class Choice(models.Model):
     # def get_absolute_url(self):
     #     return reverse('dash:question-list')
 
+    def get_delete_url(self):
+        return reverse('dash:choice-delete', args=[self.pk, ])
+
+    def get_update_url(self):
+        return reverse('dash:choice-update', args=[self.pk, ])
+
     def __str__(self):
         return self.choice_text
