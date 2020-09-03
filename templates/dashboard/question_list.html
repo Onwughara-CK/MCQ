@@ -19,7 +19,7 @@ Dashboard - Questions
 {% for question in questions %}
 <p><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a> |
     <a href="{{ question.get_delete_url }}">Delete</a>
-    | <a href="#">Update</a>
+    | <a href="{{ question.get_update_url }}">Update</a>
 </p>
 {% endfor %}
 {% else %}

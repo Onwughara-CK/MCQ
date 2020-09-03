@@ -17,7 +17,7 @@ Dashboard - {{ question.question_title }}
 
 <p>{{ question.question_text }}</p>
 
-<p><a href="{{ question.get_delete_url }}">Delete</a>| <a href="">Update</a></p>
+<p><a href="{{ question.get_delete_url }}">Delete</a>| <a href="{{ question.get_update_url }}">Update</a></p>
 <p><a href="">See all Choices for this Story</a> | <a href="">Create Choice for this Story</a></p>
 
 {% endif %}

@@ -112,16 +112,16 @@ class QuestionDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.D
         return super().delete(request, *args, **kwargs)
 
 
-# class StoryUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, generic.edit.UpdateView):
-#     model = models.Story
-#     fields = '__all__'
-#     success_message = 'Successfully Updated Story'
+class QuestionUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, generic.edit.UpdateView):
+    model = models.Question
+    fields = '__all__'
+    success_message = 'Successfully Updated Question'
 
-#     def test_func(self):
-#         user = self.request.user
-#         if not user.teacher:
-#             raise PermissionDenied
-#         return True
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
 
 
 # class StoryCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.edit.CreateView):
