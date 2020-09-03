@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - {{ question.question_title }}
+{% endblock title %}
+
+
+{% block page_title %}
+<h2>Dashboard</h2>
+{% endblock page_title %}
+
+
+{% block content %}
+
+{% if question %}
+
+
+<p>{{ question.question_text }}</p>
+
+<p><a href="{{ question.get_delete_url }}">Delete</a>| <a href="">Update</a></p>
+<p><a href="">See all Choices for this Story</a> | <a href="">Create Choice for this Story</a></p>
+
+{% endif %}
+
+{% endblock content %}

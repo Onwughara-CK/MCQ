@@ -17,4 +17,15 @@ urlpatterns = [
     path('story/<int:pk>/update/',
          views.StoryUpdateView.as_view(), name='story-update'),
     path('story/create/', views.StoryCreateView.as_view(), name='story-create'),
+
+
+    # question url
+    path('question/', views.QuestionListView.as_view(), name='question-list'),
+    path('question/<int:pk>/', views.QuestionDetailView.as_view(),
+         name='question-detail'),
+    path('question/<int:pk>/delete/',
+         views.QuestionDeleteView.as_view(), name='question-delete'),
+    #     path('story/<int:pk>/update/',
+    #          views.StoryUpdateView.as_view(), name='story-update'),
+    #     path('story/create/', views.StoryCreateView.as_view(), name='story-create'),
 ]

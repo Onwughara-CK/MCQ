@@ -31,6 +31,8 @@ class StoryListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
             raise PermissionDenied
         return True
 
+##### STORY #####
+
 
 class StoryDetailView(LoginRequiredMixin, generic.DetailView):
     model = models.Story
@@ -71,3 +73,58 @@ class StoryCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.edit.Crea
     model = models.Story
     fields = '__all__'
     success_message = 'Successfully created Story'
+
+
+###### QUESTION ######
+
+class QuestionListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
+    model = models.Question
+    template_name = "dashboard/question_list.html"
+    context_object_name = 'questions'
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
+
+
+class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
+    model = models.Question
+    template_name = "dashboard/question_detail.html"
+    context_object_name = 'question'
+
+
+class QuestionDeleteView(UserPassesTestMixin, LoginRequiredMixin, generic.edit.DeleteView):
+    model = models.Question
+    success_url = reverse_lazy('dash:question-list')
+    success_message = 'Successfully Deleted Question'
+    context_object_name = 'question'
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+# class StoryUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, generic.edit.UpdateView):
+#     model = models.Story
+#     fields = '__all__'
+#     success_message = 'Successfully Updated Story'
+
+#     def test_func(self):
+#         user = self.request.user
+#         if not user.teacher:
+#             raise PermissionDenied
+#         return True
+
+
+# class StoryCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.edit.CreateView):
+#     model = models.Story
+#     fields = '__all__'
+#     success_message = 'Successfully created Story'

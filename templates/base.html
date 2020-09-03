@@ -14,12 +14,19 @@
 <body>
     <h3>
         {% if user.is_authenticated %}
-        <a href="#">
-            Take Test |
-        </a>
+
+
+        {% if user.teacher %}
         <a href="{% url 'dash:dashboard' %}">
             Admin DashBoard |
         </a>
+        {% else %}
+        <a href="#">
+            Take Test |
+        </a>
+        {% endif %}
+
+
         <a href="{% url 'users:logout' %}">
             Logout
         </a>
