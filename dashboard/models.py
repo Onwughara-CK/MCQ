@@ -3,27 +3,27 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 
-class Story(models.Model):
-    story_title = models.CharField(max_length=100)
-    story_text = models.TextField()
+class Quiz(models.Model):
+    quiz_title = models.CharField(max_length=100)
+    quiz_text = models.TextField()
 
     def get_absolute_url(self):
-        return reverse('dash:story-detail', args=[self.pk, ])
+        return reverse('dash:quiz-detail', args=[self.pk, ])
 
     def get_delete_url(self):
-        return reverse('dash:story-delete', args=[self.pk, ])
+        return reverse('dash:quiz-delete', args=[self.pk, ])
 
     def get_update_url(self):
-        return reverse('dash:story-update', args=[self.pk, ])
+        return reverse('dash:quiz-update', args=[self.pk, ])
 
     def __str__(self):
-        return self.story_title
+        return self.quiz_title
 
 
 class Question(models.Model):
     question_text = models.CharField(max_length=250)
-    story = models.ForeignKey(
-        Story, on_delete=models.CASCADE, related_name='questions')
+    quiz = models.ForeignKey(
+        Quiz, on_delete=models.CASCADE, related_name='questions')
 
     def get_absolute_url(self):
         return reverse('dash:question-detail', args=[self.pk, ])

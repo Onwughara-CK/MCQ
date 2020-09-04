@@ -18,7 +18,9 @@ Dashboard - {{ question.question_text }}
 <p>{{ question.question_text }}</p>
 
 <p><a href="{{ question.get_delete_url }}">Delete</a>| <a href="{{ question.get_update_url }}">Update</a></p>
-<p><a href="">See all Choices for this Story</a> | <a href="">Create Choice for this Story</a></p>
+<p><a href="{% url 'dash:question-choices' question.pk %}">See all Choices for this question</a> | <a
+                href="{% url 'dash:question-choice-create' question.pk %}">Create
+                Choice for this question</a></p>
 
 {% endif %}
 

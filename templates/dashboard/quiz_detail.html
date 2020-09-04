@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - {{ quiz.quiz_title }}
+{% endblock title %}
+
+
+{% block page_title %}
+<h2>Dashboard</h2>
+{% endblock page_title %}
+
+
+{% block content %}
+
+{% if quiz %}
+
+
+<h3>{{ quiz.quiz_title }}</h3>
+<p>{{ quiz.quiz_text }}</p>
+
+<p><a href="{{ quiz.get_delete_url }}">Delete</a>| <a href="{{ quiz.get_update_url }}">Update</a></p>
+<p><a href="{% url 'dash:quiz-questions' quiz.pk %}">See all Questions for this Quiz</a> | <a
+        href="{% url 'dash:quiz-question-create' quiz.pk %}">Create
+        Question for this Quiz</a></p>
+
+{% endif %}
+
+{% endblock content %}

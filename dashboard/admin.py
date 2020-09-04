@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Story, Question, Choice
+from .models import Quiz, Question, Choice
 
 
-class StoryAdmin(admin.ModelAdmin):
-    list_display = ('story_title',)
-    search_fields = ('story_title', 'story_text')
-    ordering = ('story_title',)
+class QuizAdmin(admin.ModelAdmin):
+    list_display = ('quiz_title',)
+    search_fields = ('quiz_title', 'quiz_text')
+    ordering = ('quiz_title',)
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -20,6 +20,6 @@ class ChoiceAdmin(admin.ModelAdmin):
     ordering = ('choice_text',)
 
 
-admin.site.register(Story, StoryAdmin)
+admin.site.register(Quiz, QuizAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice, ChoiceAdmin)

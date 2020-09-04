@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - Stories
+{% endblock title %}
+
+
+{% block page_title %}
+<h2>Dashboard</h2>
+
+{% endblock page_title %}
+
+
+{% block content %}
+
+<p><a href="{% url 'dash:quiz-create' %}">Add Quiz</a></p>
+
+{% if stories %}
+
+{% for quiz in stories %}
+<p><a href="{{ quiz.get_absolute_url }}">{{ quiz.quiz_title }}</a> | <a href="{{ quiz.get_delete_url }}">Delete</a>
+    | <a href="{{ quiz.get_update_url }}">Update</a> | <a
+        href="{% url 'dash:quiz-questions' quiz.pk %}">({{ quiz.questions.count }})</a>
+</p>
+{% endfor %}
+
+{% endif %}
+
+{% endblock content %}

@@ -6,13 +6,13 @@ Dashboard - Questions
 
 
 {% block page_title %}
-<h2>Dashboard - </h2>
+<h2>Dashboard - {{ questions.first.quiz.quiz_title }} - Questions</h2>
 
 {% endblock page_title %}
 
 
 {% block content %}
-<p><a href="{% url 'dash:question-create' %}">Add Question</a></p>
+<p><a href="{% url 'dash:quiz-question-create' questions.first.quiz.pk %}">Add Question</a></p>
 
 {% if questions %}
 

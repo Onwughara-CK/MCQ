@@ -11,8 +11,8 @@ Delete
 {% block content %}
 
 <form method="POST">{% csrf_token %}
-    <p>Are you sure you want to delete "{{ story }}"?</p>
-    <p><a href="{{ story.get_absolute_url }}">No, Mistake</a></p>
+    <p>Are you sure you want to delete "{{ quiz }}"?</p>
+    <p><a href="{{ quiz.get_absolute_url }}">No, Mistake</a></p>
     <button type="submit">Delete</button>
 </form>
 
