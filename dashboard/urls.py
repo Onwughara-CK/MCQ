@@ -10,7 +10,7 @@ urlpatterns = [
     path('', views.DashView.as_view(), name='dashboard'),
 
     ### quiz url ###
-    path('quiz/', views.QuizListView.as_view(), name='quiz-list'),
+    path('quizzes/', views.QuizListView.as_view(), name='quiz-list'),
     path('quiz/<int:pk>/', views.QuizDetailView.as_view(), name='quiz-detail'),
     path('quiz/<int:pk>/delete/',
          views.QuizDeleteView.as_view(), name='quiz-delete'),
@@ -26,7 +26,7 @@ urlpatterns = [
 
 
     ### question url ###
-    path('question/', views.QuestionListView.as_view(), name='question-list'),
+    path('questions/', views.QuestionListView.as_view(), name='question-list'),
     path('question/<int:pk>/', views.QuestionDetailView.as_view(),
          name='question-detail'),
     path('question/<int:pk>/delete/',
@@ -53,5 +53,8 @@ urlpatterns = [
          views.ChoiceUpdateView.as_view(), name='choice-update'),
     #     path('choice/create/', views.QuestionCreateView.as_view(),
     #          name='question-create'),
+
+    # Create Quiz
+    path('create-quiz/', views.CreateQuiz.as_view(), name='create-quiz')
 
 ]

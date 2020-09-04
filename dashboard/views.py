@@ -7,6 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 
 from . import models
+from . import forms
 
 
 class DashView(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -248,6 +249,18 @@ class ChoiceUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMi
         question_pk = models.Choice.objects.get(
             pk=self.kwargs['pk']).question.pk
         return reverse('dash:question-choices', args=[question_pk])
+
+    def test_func(self):
+        user = self.request.user
+        if not user.teacher:
+            raise PermissionDenied
+        return True
+
+
+class CreateQuiz(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, generic.edit.FormView):
+    def get(self, request):
+        form = forms.QuizForm
+        return render(request, 'dashboard/quiz_form.html', {'form': form})
 
     def test_func(self):
         user = self.request.user
