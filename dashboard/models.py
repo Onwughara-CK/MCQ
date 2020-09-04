@@ -2,10 +2,13 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from datetime import timedelta
+
 
 class Quiz(models.Model):
     quiz_title = models.CharField(max_length=100)
     quiz_text = models.TextField()
+    duration = models.DurationField(default=timedelta(minutes=5))
 
     def get_absolute_url(self):
         return reverse('dash:quiz-detail', args=[self.pk, ])
