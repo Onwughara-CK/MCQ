@@ -8,7 +8,7 @@ from datetime import timedelta
 class Result(models.Model):
     score = models.IntegerField(default=0)
     user = models.ForeignKey(
-        get_user_model, related_name='results', on_delete=models.CASCADE)
+        get_user_model(), related_name='results', on_delete=models.CASCADE)
     timespent = models.DurationField(default=0)
     failed = models.IntegerField(default=0)
     passed = models.IntegerField(default=0)
