@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - Exam
+{% endblock title %}
+
+
+{% block page_title %}
+<h2>Exam Hall</h2>
+
+{% endblock page_title %}
+
+
+{% block content %}
+
+
+{% if exams %}
+
+{% for exam in exams %}
+<p>
+    <a href="{% url 'exam:exam-questions-list' exam.pk %}">{{ exam.quiz_title }}</a> |
+    <span>({{ exam.questions.count }}
+        question{{ exam.questions.count|pluralize }})</span> |
+    <span>Duration : {{ exam.duration }}</span>
+</p>
+{% endfor %}
+
+{% endif %}
+
+{% endblock content %}

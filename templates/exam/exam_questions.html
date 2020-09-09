@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - Exam
+{% endblock title %}
+
+
+{% block page_title %}
+<h2>Exam Hall</h2>
+
+{% endblock page_title %}
+
+
+{% block content %}
+
+
+{% if questions %}
+
+{% for question in questions %}
+<div>
+    <p>{{ question.quiz.quiz_text }}</p>
+    <p>{{ question.question_text }}</p>
+
+    {% for choice in question.choices.all %}
+
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.pk }}"> <label
+        for="">{{ choice }}</label> <br>
+
+    {% endfor %}
+
+
+</div>
+{% endfor %}
+
+{% endif %}
+
+{% endblock content %}

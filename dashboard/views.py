@@ -115,7 +115,7 @@ class QuestionDeleteView(
     generic.edit.DeleteView
 ):
     model = Question
-    success_url = reverse_lazy('dash:question-list')
+    success_url = reverse_lazy('dash:quiz-questions')
     success_message = 'Successfully Deleted Question'
     context_object_name = 'question'
 
@@ -125,7 +125,11 @@ class QuestionDeleteView(
             raise PermissionDenied
         return True
 
+    def get_success_url(self):
+        return reverse('dash:quiz-questions', args=[self.object.quiz.pk])
+
     def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
 

@@ -5,15 +5,6 @@ from django.urls import reverse
 from datetime import timedelta
 
 
-class Result(models.Model):
-    score = models.IntegerField(default=0)
-    user = models.ForeignKey(
-        get_user_model(), related_name='results', on_delete=models.CASCADE)
-    timespent = models.DurationField(default=0)
-    failed = models.IntegerField(default=0)
-    passed = models.IntegerField(default=0)
-
-
 class Quiz(models.Model):
     quiz_title = models.CharField(max_length=100)
     quiz_text = models.TextField()
@@ -62,9 +53,6 @@ class Choice(models.Model):
         get_user_model(), related_name='choices')
     mark = models.CharField(
         max_length=5, choices=MARK, default='wrong')
-
-    # def get_absolute_url(self):
-    #     return reverse('dash:question-list')
 
     def get_delete_url(self):
         return reverse('dash:choice-delete', args=[self.pk, ])

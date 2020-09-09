@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'dashboard.apps.DashboardConfig',
+    'exam.apps.ExamConfig',
 ]
 
 MIDDLEWARE = [
@@ -132,4 +133,4 @@ STATICFILES_DIRS = [
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = LOGIN_URL
+LOGOUT_REDIRECT_URL = '/'
