@@ -15,7 +15,7 @@ Welcome
             </a>
             {% if user.teacher %}
             <a href="{% url 'dash:dashboard' %}">
-                Admin
+                Dashboard (Teachers only)
             </a>
             {% else %}
             | <a href="#">

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Dashboard - Stories
+Dashboard - Quizzes
 {% endblock title %}
 
 
@@ -13,14 +13,15 @@ Dashboard - Stories
 
 {% block content %}
 
-<p><a href="{% url 'dash:quiz-create' %}">Add Quiz</a></p>
+<p><a href="{% url 'dash:create-quiz' %}">Create Quiz</a></p>
 
-{% if stories %}
+{% if quizzes %}
 
-{% for quiz in stories %}
+{% for quiz in quizzes %}
 <p><a href="{{ quiz.get_absolute_url }}">{{ quiz.quiz_title }}</a> | <a href="{{ quiz.get_delete_url }}">Delete</a>
     | <a href="{{ quiz.get_update_url }}">Update</a> | <a
-        href="{% url 'dash:quiz-questions' quiz.pk %}">({{ quiz.questions.count }})</a>
+        href="{% url 'dash:quiz-questions' quiz.pk %}">({{ quiz.questions.count }}
+        question{{ quiz.questions.count|pluralize }})</a>
 </p>
 {% endfor %}
 

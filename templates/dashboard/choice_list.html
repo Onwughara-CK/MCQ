@@ -17,8 +17,6 @@ Dashboard - Choices
 
 {% for choice in choices %}
 <p> {{ choice }}
-    - <a href="{{ choice.get_delete_url }}">Delete</a>
-    |
     <a href="{{ choice.get_update_url }}">Update</a>
 </p>
 {% endfor %}

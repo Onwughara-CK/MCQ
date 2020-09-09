@@ -33,7 +33,7 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    question_text = models.CharField(max_length=250)
+    question_text = models.TextField()
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name='questions')
 

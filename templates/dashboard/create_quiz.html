@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Edit/Create
+{% endblock title %}
+
+
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {% if ChoiceForm %}
+    {{QuestionForm.as_p}}
+    <hr>
+    {{ChoiceForm.as_p}}
+    {% else %}
+    {{ form.as_p }}
+    {% endif %}
+</form>
+<div id="move">
+    <a id='finish' href="{% url 'dash:quiz-list' %}">Save and Finish</a> |
+    <a id='continue' href="">Save and Create Question</a>
+</div>
+
+
+<!-- <span class="page">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        {% else %}
+        <button id='finish' type="button">Finish</button>
+        {% endif %}
+    </span> -->
+{% endblock content %}

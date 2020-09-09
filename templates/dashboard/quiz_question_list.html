@@ -12,9 +12,11 @@ Dashboard - Questions
 
 
 {% block content %}
-<p><a href="{% url 'dash:quiz-question-create' questions.first.quiz.pk %}">Add Question</a></p>
 
 {% if questions %}
+<p><a href="{% url 'dash:create-question-choice' questions.first.quiz.pk %}">Create Question for
+        {{ questions.first.quiz.quiz_title }}</a></p>
+
 
 {% for question in questions %}
 <p><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a> |
