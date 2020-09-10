@@ -9,4 +9,6 @@ urlpatterns = [
          name='exam-list'),
     path('<int:pk>/', views.ExamQuestionsListView.as_view(),
          name='exam-questions-list'),
+    path('result/', views.ExamResultView.as_view(),
+         name='exam-result'),
 ]

@@ -27,20 +27,6 @@ $(function () {
     }
     return data;
   }
-  $('#hsfjhfsj').click(function (e) {
-    $.ajax({
-      type: 'POST',
-      url: '/dashboard/create-quiz/',
-      data: tag(),
-      success: function (response) {
-        console.log(response);
-        console.log(response);
-      },
-      error: function () {
-        console.error('error');
-      },
-    });
-  });
 
   $('#move > #finish').click(function (e) {
     data = tag();
