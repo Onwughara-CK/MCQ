@@ -1,9 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import generic, View
 from django.http import JsonResponse, HttpResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 
 from dashboard.models import Quiz, Choice, Question
 
@@ -24,17 +22,56 @@ class ExamQuestionsListView(LoginRequiredMixin, generic.ListView):
             pk=self.kwargs['pk']).questions.all().order_by('question_text')
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['quiz_pk'] = self.kwargs['pk']
+        return context
 
-@method_decorator(csrf_exempt, name='post')
+
 class ExamResultView(LoginRequiredMixin, View):
     def get(self, request):
         data = {}
         for k, v in request.session.items():
             if "Question" in k:
                 data[k] = v
-        return JsonResponse(data)
+        return render(request, 'exam/result_sheet.html')
 
     def post(self, request):
         for k, v in request.POST.items():
             request.session[k] = v
+        if request.POST.get('finish'):
+            correct_choices = Choice.objects.filter(
+                question__quiz__pk=request.POST.get('quiz_pk')).filter(mark='right')
+            result = {
+                'no_of_questions': Quiz.objects.get(pk=request.POST.get('quiz_pk')).questions.count(),
+                'no_of_correct_choices_answered': 0,
+                'no_of_questions_answered': 0,
+            }
+            corrections = {}
+            corrections_list = []
+            for correct_choice in correct_choices:
+                corrections[correct_choice.question.pk] = {
+                    'question': correct_choice.question.question_text,
+                    'correct_choice': correct_choice.choice_text,
+                    'your_choice': 'You Did not Answer This Question',
+                }
+
+            for question_id, your_choice_id in request.session.items():
+                if 'Question' in question_id:
+                    result['no_of_questions_answered'] += 1
+                    your_choice = Choice.objects.get(
+                        pk=your_choice_id)
+                    corrections[your_choice.question.pk]['your_choice'] = your_choice.choice_text
+
+                    if your_choice in correct_choices:
+                        result['no_of_correct_choices_answered'] += 1
+            for _, v in corrections.items():
+                corrections_list.append(v)
+            result['corrections'] = corrections_list
+            result['score_percent'] = result['no_of_correct_choices_answered'] / \
+                result['no_of_questions'] * 100
+            for key in list(request.session.keys()):
+                if not key.startswith('_'):
+                    del request.session[key]
+            return render(request, 'exam/result_sheet.html', result)
         return HttpResponse('works')

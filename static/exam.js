@@ -1,13 +1,11 @@
 $(function () {
   $('#exam').on('change', function () {
     var selectedId = $('input[name=choice]:checked', '#exam').attr('id');
-    var selectedValue = $('input[name=choice]:checked', '#exam').attr('value');
     data = {
-      [selectedId]: selectedValue,
+      [selectedId]: $('input[name=choice]:checked', '#exam').attr('value'),
       csrfmiddlewaretoken: $("input[name= 'csrfmiddlewaretoken']").val(),
     };
 
-    console.log(data);
     $.ajax({
       type: 'POST',
       url: '/exam/result/',

@@ -79,7 +79,7 @@ class QuizUpdateView(
     generic.edit.UpdateView
 ):
     model = Quiz
-    fields = '__all__'
+    fields = ('quiz_text', 'duration', 'quiz_title')
     success_message = 'Successfully Updated quiz'
 
     def test_func(self):
@@ -115,7 +115,6 @@ class QuestionDeleteView(
     generic.edit.DeleteView
 ):
     model = Question
-    success_url = reverse_lazy('dash:quiz-questions')
     success_message = 'Successfully Deleted Question'
     context_object_name = 'question'
 
@@ -141,7 +140,7 @@ class QuestionUpdateView(
     generic.edit.UpdateView
 ):
     model = Question
-    fields = '__all__'
+    fields = ('question_text',)
     success_message = 'Successfully Updated Question'
 
     def test_func(self):
@@ -188,7 +187,7 @@ class ChoiceUpdateView(
     def get_success_url(self):
         question_pk = Choice.objects.get(
             pk=self.kwargs['pk']).question.pk
-        return reverse('dash:question-choices', args=[question_pk])
+        return reverse('dash:question-detail', args=[question_pk])
 
     def test_func(self):
         user = self.request.user

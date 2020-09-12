@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if corrections %}
+<div style="margin-bottom: 10px; border: 1px black solid;">
+    <p>
+        <h2>Email : {{ user.email }}</h2>
+    </p>
+    <p>
+        Percentage : {{ score_percent |floatformat:"0" }} %
+    </p>
+
+    <p>
+        No of questions :{{ no_of_questions }}
+    </p>
+    <p>
+        No of Correct Answers Chosen: {{ no_of_correct_choices_answered }}
+    </p>
+    <p>
+        No of Questions Answered: {{ no_of_questions_answered }}
+    </p>
+</div>
+{% for correction in corrections %}
+<div style="margin-bottom: 10px; border: 1px black solid;">
+    <p>
+        Question: {{correction.question}}
+    </p>
+    <p>
+        Correct Answer: {{correction.correct_choice}}
+    </p>
+    <p>
+        Your Answer: {{correction.your_choice}}
+    </p>
+</div>
+{% endfor %}
+{% else %}
+<h3>You Have Not Taken Exam. Click the link below</h3>
+{% endif %}
+
+
+<a href="{% url 'exam:exam-list' %}">Back To Exam list</a>
+{% endblock content %}

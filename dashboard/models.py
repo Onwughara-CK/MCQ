@@ -49,8 +49,8 @@ class Choice(models.Model):
     choice_text = models.CharField(max_length=250)
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name='choices')
-    users = models.ManyToManyField(
-        get_user_model(), related_name='choices')
+    # users = models.ManyToManyField(
+    #     get_user_model(), related_name='choices')
     mark = models.CharField(
         max_length=5, choices=MARK, default='wrong')
 

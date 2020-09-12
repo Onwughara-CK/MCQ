@@ -9,34 +9,30 @@ Dashboard - Exam
 
 {% block page_title %}
 <h2>Exam Hall</h2>
-
 {% endblock page_title %}
 
 
 {% block content %}
-
-
 {% if questions %}
-
-
-
+<input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
 {% for question in questions %}
 
-{% with id=question.pk %}
+
+
 <div id="exam">
     <p>{{ question.quiz.quiz_text }}</p>
     <p>{{ question.question_text }}</p>
     <form action="" method="POST">
         {% csrf_token %}
         {% for choice in question.choices.all %}
-        <input type="radio" name="choice" id="Question{{ id }}" value="{{ choice.pk }}"> <label
+        <input type="radio" name="choice" id="Question{{ page_obj.number }}" value="{{ choice.pk }}"> <label
             for="">{{ choice }}</label>
         <br>
 
         {% endfor %}
     </form>
 </div>
-{% endwith %}
+
 {% endfor %}
 {% endif %}
 <div style="margin-top: 20px;">
@@ -49,11 +45,21 @@ Dashboard - Exam
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
         </span>
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">next</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        <a class="next" href="?page={{ page_obj.next_page_number }}">next</a>
+        <a class="last" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
+    <form action="/exam/result/" method="post">
+        {% csrf_token %}
+        <input id='finish' type="submit" value="Finish" name="finish">
+        <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
+    </form>
+    <!-- <div id="finish">
+        <button id="finish" type="submit" style="margin-left: 50%;">Finish Exam</button>
+    </div> -->
 </div>
+
+
 
 {% endblock content %}
 
