@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import generic, View
 from django.http import JsonResponse, HttpResponse
+from django.utils import timezone
+from django.utils.dateparse import parse_duration
 
 from dashboard.models import Quiz, Choice, Question
 
@@ -10,6 +12,12 @@ class ExamListView(LoginRequiredMixin, generic.ListView):
     model = Quiz
     template_name = "exam/exam_list.html"
     context_object_name = 'exams'
+
+
+class ExamInstructionsView(View):
+    def get(self, request, *args, **kwargs):
+        exam = get_object_or_404(Quiz, pk=kwargs['pk'])
+        return render(request, 'exam/exam_instructions.html', {'exam': exam})
 
 
 class ExamQuestionsListView(LoginRequiredMixin, generic.ListView):
@@ -34,7 +42,7 @@ class ExamResultView(LoginRequiredMixin, View):
         for k, v in request.session.items():
             if "Question" in k:
                 data[k] = v
-        return render(request, 'exam/result_sheet.html')
+        return JsonResponse(data)
 
     def post(self, request):
         for k, v in request.POST.items():
@@ -75,3 +83,19 @@ class ExamResultView(LoginRequiredMixin, View):
                     del request.session[key]
             return render(request, 'exam/result_sheet.html', result)
         return HttpResponse('works')
+
+
+class ExamTimerView(View):
+
+    def get(self, request):
+        return HttpResponse(ExamTimerView.deadline_in_ms)
+
+    def post(self, request):
+        exam_duration = get_object_or_404(
+            Quiz, pk=request.POST.get('pk')).duration
+        delta = parse_duration(str(exam_duration))
+
+        deadline = timezone.now() + delta
+        ExamTimerView.deadline_in_ms = int(deadline.timestamp()*1000)
+
+        return HttpResponse(ExamTimerView.deadline_in_ms)

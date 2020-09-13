@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Dashboard - Exam
@@ -18,7 +19,7 @@ Dashboard - Exam
 
 {% for exam in exams %}
 <p>
-    <a href="{% url 'exam:exam-questions-list' exam.pk %}">{{ exam.quiz_title }}</a> |
+    <a id='exam_list' href="{% url 'exam:exam-instruction' exam.pk %}">{{ exam.quiz_title }}</a> |
     <span>({{ exam.questions.count }}
         question{{ exam.questions.count|pluralize }})</span> |
     <span>Duration : {{ exam.duration }}</span>
@@ -28,3 +29,9 @@ Dashboard - Exam
 {% endif %}
 
 {% endblock content %}
+
+{% block js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="{% static 'exam.js' %}"></script>
+{% endblock js %}

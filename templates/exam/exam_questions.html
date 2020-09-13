@@ -13,11 +13,13 @@ Dashboard - Exam
 
 
 {% block content %}
+
 {% if questions %}
 <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
 {% for question in questions %}
 
 
+<h2 id="timer"> TIMER</h2>
 
 <div id="exam">
     <p>{{ question.quiz.quiz_text }}</p>

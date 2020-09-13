@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Instructions
+{% endblock title %}
+
+{% block content %}
+<div>
+    <h1>Instructions</h1>
+    <ul>
+        <li>The test contains {{ exam.questions.count }} question{{ exam.questions.count|pluralize }} and there is time
+            limit.</li>
+        <li>The test has a duration of {{ exam.duration }}
+        </li>
+        <li> You will get 10 percent for each correct answer. At the end of the Quiz, your total score will be
+            displayed. Maximum score is 100 percent.</li>
+        <li>Good luck!</li>
+    </ul>
+</div>
+<div>
+    <a id="exam_questions" href="{% url 'exam:exam-questions-list' exam.pk %}">Start Quiz</a>
+    <input type="hidden" name="pk" value="{{ exam.pk }}">
+    {% csrf_token %}
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="{% static 'instruct.js' %}"></script>
+{% endblock js %}
