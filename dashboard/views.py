@@ -110,8 +110,8 @@ class QuestionDetailView(LoginRequiredMixin, generic.DetailView):
 
 
 class QuestionDeleteView(
-    UserPassesTestMixin,
     LoginRequiredMixin,
+    UserPassesTestMixin,
     generic.edit.DeleteView
 ):
     model = Question
@@ -134,8 +134,8 @@ class QuestionDeleteView(
 
 
 class QuestionUpdateView(
-    UserPassesTestMixin,
     LoginRequiredMixin,
+    UserPassesTestMixin,
     SuccessMessageMixin,
     generic.edit.UpdateView
 ):
