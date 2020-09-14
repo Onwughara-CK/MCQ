@@ -1,8 +1,8 @@
+from datetime import timedelta
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-
-from datetime import timedelta
 
 
 class Quiz(models.Model):

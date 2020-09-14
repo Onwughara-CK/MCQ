@@ -52,8 +52,8 @@ class QuizDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView
 
 
 class QuizDeleteView(
-    UserPassesTestMixin,
     LoginRequiredMixin,
+    UserPassesTestMixin,
     generic.edit.DeleteView
 ):
     model = Quiz
@@ -73,8 +73,8 @@ class QuizDeleteView(
 
 
 class QuizUpdateView(
-    UserPassesTestMixin,
     LoginRequiredMixin,
+    UserPassesTestMixin,
     SuccessMessageMixin,
     generic.edit.UpdateView
 ):
