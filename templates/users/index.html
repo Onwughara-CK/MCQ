@@ -18,7 +18,7 @@ Welcome
                 Dashboard (Teachers only)
             </a>
             {% else %}
-            | <a href="#">
+            | <a href="{% url 'exam:exam-list' %}">
                 Take Quiz
             </a>
             {% endif %}
