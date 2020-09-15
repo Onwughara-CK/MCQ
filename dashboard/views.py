@@ -175,8 +175,8 @@ class QuizQuestionsListView(
 
 
 class ChoiceUpdateView(
-    UserPassesTestMixin,
     LoginRequiredMixin,
+    UserPassesTestMixin,
     SuccessMessageMixin,
     generic.edit.UpdateView
 ):

@@ -70,6 +70,11 @@ class QuizListViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+        ### create 10 quizzes ###
+        for i in range(1, 11):
+            models.Quiz.objects.create(
+                quiz_title=f'title {i}', quiz_text=f'text {i}')
+
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('dash:quiz-list'))
         self.assertRedirects(response, '/login/?next=/dashboard/quizzes/')
@@ -94,11 +99,14 @@ class QuizListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'dashboard/quiz_list.html')
 
-    def test_context_object_name(self):
+    def test_context_object(self):
         _ = self.client.login(
             email='teacher@test.com', password='asdf7890')
         response = self.client.get(reverse('dash:quiz-list'))
         self.assertTrue('quizzes' in response.context)
+        self.assertContains(response, 'title 10')
+        self.assertCountEqual(
+            response.context['quizzes'], models.Quiz.objects.all())
 
 
 class QuizDetailViewTest(TestCase):
@@ -145,12 +153,13 @@ class QuizDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'dashboard/quiz_detail.html')
 
-    def test_context_object_name(self):
+    def test_context_object(self):
         quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
         _ = self.client.login(
             email='teacher@test.com', password='asdf7890')
         response = self.client.get(reverse('dash:quiz-detail', args=[quiz.pk]))
         self.assertTrue('quiz' in response.context)
+        self.assertContains(response, 'title')
 
 
 class QuizDeleteViewTest(TestCase):
@@ -328,6 +337,12 @@ class QuestionListViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+        ### create 10 questions ###
+        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
+        for i in range(1, 11):
+            models.Question.objects.create(
+                question_text=f'text {i}', quiz=quiz)
+
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('dash:question-list'))
         self.assertRedirects(response, '/login/?next=/dashboard/questions/')
@@ -352,11 +367,14 @@ class QuestionListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'dashboard/question_list.html')
 
-    def test_context_object_name(self):
+    def test_context_object(self):
         _ = self.client.login(
             email='teacher@test.com', password='asdf7890')
         response = self.client.get(reverse('dash:question-list'))
         self.assertTrue('questions' in response.context)
+        self.assertContains(response, 'text 10')
+        self.assertCountEqual(
+            response.context['questions'], models.Question.objects.all())
 
 
 class QuestionDetailViewTest(TestCase):
@@ -581,3 +599,67 @@ class QuestionUpdateViewTest(TestCase):
         # no context data as it redirects
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(str(messages[0]), 'Successfully Updated Question')
+
+
+class QuizQuestionsListViewTest(TestCase):
+    """
+    Test Quiz Questions List View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create student ###
+        cls.student = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+        ### create 10 questions for quiz###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+        for i in range(1, 11):
+            models.Question.objects.create(
+                question_text=f'text {i}', quiz=cls.quiz)
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(
+            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+        self.assertRedirects(
+            response, '/login/?next=/dashboard/quiz/1/questions/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_with_correct_permission(self):
+        _ = self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        response = self.client.get(
+            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_logged_in_but_not_correct_permission(self):
+        _ = self.client.login(
+            email='student@test.com', password='asdf7890')
+        response = self.client.get(
+            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_returns_correct_template(self):
+        _ = self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        response = self.client.get(
+            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'dashboard/quiz_question_list.html')
+
+    def test_context_object(self):
+        _ = self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        response = self.client.get(
+            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+        self.assertTrue('questions' in response.context)
+        self.assertCountEqual(
+            response.context['questions'], self.quiz.questions.all())
