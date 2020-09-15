@@ -663,3 +663,84 @@ class QuizQuestionsListViewTest(TestCase):
         self.assertTrue('questions' in response.context)
         self.assertCountEqual(
             response.context['questions'], self.quiz.questions.all())
+
+
+class ChoiceUpdateViewTest(TestCase):
+    """
+    Test Choice Update View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create student ###
+        cls.student = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+    def setUp(self):
+        self.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+        self.question = models.Question.objects.create(
+            question_text='text', quiz=self.quiz)
+        self.choice = models.Choice.objects.create(
+            choice_text='text', question=self.question)
+
+    def test_redirect_if_not_logged_in(self):
+        response_get = self.client.get(
+            reverse('dash:choice-update', args=[1]))
+        response_put = self.client.put(
+            reverse('dash:choice-update', args=[1]))
+        self.assertRedirects(
+            response_get, '/login/?next=/dashboard/choice/1/update/')
+        self.assertRedirects(
+            response_put, '/login/?next=/dashboard/choice/1/update/')
+        self.assertEqual(response_get.status_code, 302)
+        self.assertEqual(response_put.status_code, 302)
+
+    def test_logged_in_but_not_correct_permission(self):
+        _ = self.client.login(
+            email='student@test.com', password='asdf7890')
+        response_get = self.client.get(
+            reverse('dash:choice-update', args=[1]))
+        response_put = self.client.put(
+            reverse('dash:choice-update', args=[1]))
+        self.assertEqual(response_put.status_code, 403)
+        self.assertEqual(response_get.status_code, 403)
+
+    def test_logged_in_with_correct_permission(self):
+        _ = self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        response_get = self.client.get(
+            reverse('dash:choice-update', args=[self.choice.pk]))
+        self.assertEqual(response_get.status_code, 200)
+        response_put = self.client.post(
+            path=reverse('dash:choice-update', args=[self.choice.pk]),
+            data={
+                'choice_text': 'text updated',
+                'mark': 'wrong'
+            }
+        )  # use client.post instead of client.put
+        self.assertEqual(response_put.status_code,
+                         302)  # redirects after update
+        self.choice.refresh_from_db()
+        self.assertEqual(self.choice.choice_text, 'text updated')
+
+    def test_success_message(self):
+        _ = self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        response = self.client.post(
+            reverse('dash:choice-update', args=[self.choice.pk]),
+            {
+                'mark': 'wrong',
+                'choice_text': 'text updated',
+            }
+        )
+        # no context data as it redirects
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), 'Successfully Updated Choice')

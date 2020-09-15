@@ -197,8 +197,8 @@ class ChoiceUpdateView(
 
 
 class CreateQuiz(
-    UserPassesTestMixin,
     LoginRequiredMixin,
+    UserPassesTestMixin,
     SuccessMessageMixin,
     generic.edit.FormView
 ):
