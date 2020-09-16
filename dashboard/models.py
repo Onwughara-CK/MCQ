@@ -52,10 +52,7 @@ class Choice(models.Model):
     # users = models.ManyToManyField(
     #     get_user_model(), related_name='choices')
     mark = models.CharField(
-        max_length=5, choices=MARK, default='wrong')
-
-    def get_delete_url(self):
-        return reverse('dash:choice-delete', args=[self.pk, ])
+        max_length=5, choices=MARK, default='wrong')    
 
     def get_update_url(self):
         return reverse('dash:choice-update', args=[self.pk, ])
