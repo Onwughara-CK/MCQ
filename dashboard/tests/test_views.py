@@ -27,29 +27,29 @@ class DashViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(reverse('dash:dashboard'))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response = self.client.get(reverse('dash:dashboard'))
         self.assertRedirects(response, '/login/?next=/dashboard/')
         self.assertEqual(response.status_code, 302)
 
     def test_logged_in_with_correct_permission(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:dashboard'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response = self.client.get(reverse('dash:dashboard'))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:dashboard'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/dash.html')
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'dashboard/dash.html')
 
 
 class QuizListViewTest(TestCase):
@@ -75,38 +75,35 @@ class QuizListViewTest(TestCase):
             models.Quiz.objects.create(
                 quiz_title=f'title {i}', quiz_text=f'text {i}')
 
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(reverse('dash:quiz-list'))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response = self.client.get(reverse('dash:quiz-list'))
         self.assertRedirects(response, '/login/?next=/dashboard/quizzes/')
         self.assertEqual(response.status_code, 302)
 
     def test_logged_in_with_correct_permission(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-list'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response = self.client.get(reverse('dash:quiz-list'))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/quiz_list.html')
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'dashboard/quiz_list.html')
 
     def test_context_object(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-list'))
-        self.assertTrue('quizzes' in response.context)
-        self.assertContains(response, 'title 10')
+        self.assertTrue('quizzes' in self.response.context)
+        self.assertContains(self.response, 'title 10')
         self.assertCountEqual(
-            response.context['quizzes'], models.Quiz.objects.all())
+            self.response.context['quizzes'], models.Quiz.objects.all())
 
 
 class QuizDetailViewTest(TestCase):
@@ -127,39 +124,40 @@ class QuizDetailViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+        ### create quiz ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(
+            reverse('dash:quiz-detail', args=[self.quiz.pk]))
+
     def test_redirect_if_not_logged_in(self):
-        response = self.client.get(reverse('dash:quiz-detail', args=[1]))
+        self.client.logout()
+        response = self.client.get(
+            reverse('dash:quiz-detail', args=[self.quiz.pk]))
         self.assertRedirects(response, '/login/?next=/dashboard/quiz/1/')
         self.assertEqual(response.status_code, 302)
 
     def test_logged_in_with_correct_permission(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-detail', args=[quiz.pk]))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-detail', args=[1]))
+        response = self.client.get(
+            reverse('dash:quiz-detail', args=[self.quiz.pk]))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-detail', args=[quiz.pk]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/quiz_detail.html')
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'dashboard/quiz_detail.html')
 
     def test_context_object(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-detail', args=[quiz.pk]))
-        self.assertTrue('quiz' in response.context)
-        self.assertContains(response, 'title')
+        self.assertTrue('quiz' in self.response.context)
+        self.assertContains(self.response, 'title')
 
 
 class QuizDeleteViewTest(TestCase):
@@ -180,7 +178,22 @@ class QuizDeleteViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+    def setUp(self):
+        ### create quiz ###
+        self.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+
+        self.response_get = self.client.get(
+            reverse('dash:quiz-delete', args=[self.quiz.pk]))
+
+        self.response_delete = self.client.delete(
+            reverse('dash:quiz-delete', args=[self.quiz.pk]))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response_get = self.client.get(reverse('dash:quiz-delete', args=[1]))
         response_delete = self.client.delete(
             reverse('dash:quiz-delete', args=[1]))
@@ -192,7 +205,7 @@ class QuizDeleteViewTest(TestCase):
         self.assertEqual(response_delete.status_code, 302)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(reverse('dash:quiz-delete', args=[1]))
         response_delete = self.client.delete(
@@ -201,44 +214,24 @@ class QuizDeleteViewTest(TestCase):
         self.assertEqual(response_get.status_code, 403)
 
     def test_logged_in_with_correct_permission(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response_get = self.client.get(
-            reverse('dash:quiz-delete', args=[quiz.pk]))
-        # redirects to confirm delete template
-        self.assertEqual(response_get.status_code, 200)
-
-        response_delete = self.client.delete(
-            reverse('dash:quiz-delete', args=[quiz.pk]))
-        self.assertEqual(response_delete.status_code,
-                         302)  # redirects after delete
-        self.assertFalse(models.Quiz.objects.filter(
-            pk=quiz.pk).exists())  # check if the deleted item still exists
+        # returns confirm delete template
+        self.assertEqual(self.response_get.status_code, 200)
+        # redirects after delete
+        self.assertEqual(self.response_delete.status_code, 302)
+        # check if the deleted item still exists
+        self.assertFalse(models.Quiz.objects.filter(pk=self.quiz.pk).exists())
 
     def test_returns_correct_confirm_delete_template(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-delete', args=[quiz.pk]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/quiz_confirm_delete.html')
+        self.assertEqual(self.response_get.status_code, 200)
+        self.assertTemplateUsed(
+            self.response_get, 'dashboard/quiz_confirm_delete.html')
 
     def test_context_object_name(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-delete', args=[quiz.pk]))
-        self.assertTrue('quiz' in response.context)
+        self.assertTrue('quiz' in self.response_get.context)
 
     def test_success_message(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.delete(
-            reverse('dash:quiz-delete', args=[quiz.pk]))
         # no context data as it redirects
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(get_messages(self.response_delete.wsgi_request))
         self.assertEqual(str(messages[0]), 'Successfully Deleted quiz')
 
 
@@ -260,7 +253,24 @@ class QuizUpdateViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+        self.response_get = self.client.get(
+            reverse('dash:quiz-update', args=[self.quiz.pk]))
+        self.response_put = self.client.post(
+            path=reverse('dash:quiz-update', args=[self.quiz.pk]),
+            data={
+                'quiz_text': 'text updated',
+                'duration':    timedelta(minutes=30),
+                'quiz_title': 'title updated',
+            }
+        )
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response_get = self.client.get(reverse('dash:quiz-update', args=[1]))
         response_put = self.client.put(
             reverse('dash:quiz-update', args=[1]))
@@ -272,7 +282,7 @@ class QuizUpdateViewTest(TestCase):
         self.assertEqual(response_put.status_code, 302)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(reverse('dash:quiz-update', args=[1]))
         response_put = self.client.put(
@@ -281,42 +291,27 @@ class QuizUpdateViewTest(TestCase):
         self.assertEqual(response_get.status_code, 403)
 
     def test_logged_in_with_correct_permission(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response_get = self.client.get(
-            reverse('dash:quiz-update', args=[quiz.pk]))
-        self.assertEqual(response_get.status_code, 200)
-        response_put = self.client.post(
-            path=reverse('dash:quiz-update', args=[quiz.pk]),
-            data={
-                'quiz_text': 'text updated',
-                'duration':    timedelta(minutes=30),
-                'quiz_title': 'title updated',
-            }
-        )  # use client.post instead of client.put
-        self.assertEqual(response_put.status_code,
+        self.assertEqual(self.response_get.status_code, 200)
+        # use client.post instead of client.put
+        self.assertEqual(self.response_put.status_code,
                          302)  # redirects after update
-        quiz.refresh_from_db()
-        self.assertEqual(quiz.quiz_text, 'text updated')
-        self.assertEqual(quiz.quiz_title, 'title updated')
-        self.assertEqual(quiz.duration, timedelta(minutes=30))
+        self.quiz.refresh_from_db()
+        self.assertEqual(self.quiz.quiz_text, 'text updated')
+        self.assertEqual(self.quiz.quiz_title, 'title updated')
+        self.assertEqual(self.quiz.duration, timedelta(minutes=30))
 
     def test_success_message(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.post(
-            reverse('dash:quiz-update', args=[quiz.pk]),
-            {
-                'quiz_text': 'text updated',
-                'duration':    timedelta(minutes=30),
-                'quiz_title': 'title updated',
-            }
-        )
         # no context data as it redirects
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(get_messages(self.response_put.wsgi_request))
         self.assertEqual(str(messages[0]), 'Successfully Updated quiz')
+
+    def test_invalid_data(self):
+        response_put = self.client.post(
+            path=reverse('dash:quiz-update', args=[self.quiz.pk]),
+            data={}
+        )
+        # meant to redirect with status code 302 not 200
+        self.assertEqual(response_put.status_code, 200)
 
 
 class QuestionListViewTest(TestCase):
@@ -343,38 +338,35 @@ class QuestionListViewTest(TestCase):
             models.Question.objects.create(
                 question_text=f'text {i}', quiz=quiz)
 
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(reverse('dash:question-list'))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response = self.client.get(reverse('dash:question-list'))
         self.assertRedirects(response, '/login/?next=/dashboard/questions/')
         self.assertEqual(response.status_code, 302)
 
     def test_logged_in_with_correct_permission(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:question-list'))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response = self.client.get(reverse('dash:question-list'))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:question-list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/question_list.html')
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'dashboard/question_list.html')
 
     def test_context_object(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:question-list'))
-        self.assertTrue('questions' in response.context)
-        self.assertContains(response, 'text 10')
+        self.assertTrue('questions' in self.response.context)
+        self.assertContains(self.response, 'text 10')
         self.assertCountEqual(
-            response.context['questions'], models.Question.objects.all())
+            self.response.context['questions'], models.Question.objects.all())
 
 
 class QuestionDetailViewTest(TestCase):
@@ -395,40 +387,34 @@ class QuestionDetailViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+        ### create question ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+        cls.question = models.Question.objects.create(
+            question_text='text', quiz=cls.quiz)
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(
+            reverse('dash:question-detail', args=[self.question.pk]))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response = self.client.get(reverse('dash:question-detail', args=[1]))
         self.assertRedirects(response, '/login/?next=/dashboard/question/1/')
         self.assertEqual(response.status_code, 302)
 
     def test_logged_in_with_correct_permission(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:question-detail', args=[question.pk]))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
 
     def test_returns_correct_template(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:question-detail', args=[question.pk]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/question_detail.html')
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(
+            self.response, 'dashboard/question_detail.html')
 
     def test_context_object_name(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:question-detail', args=[question.pk]))
-        self.assertTrue('question' in response.context)
+        self.assertTrue('question' in self.response.context)
 
 
 class QuestionDeleteViewTest(TestCase):
@@ -449,7 +435,25 @@ class QuestionDeleteViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+    def setUp(self):
+        ### create question ###
+        self.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+
+        self.question = models.Question.objects.create(
+            question_text='text', quiz=self.quiz)
+
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+
+        self.response_get = self.client.get(
+            reverse('dash:question-delete', args=[self.question.pk]))
+
+        self.response_delete = self.client.delete(
+            reverse('dash:question-delete', args=[self.question.pk]))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response_get = self.client.get(
             reverse('dash:question-delete', args=[1]))
         response_delete = self.client.delete(
@@ -462,7 +466,7 @@ class QuestionDeleteViewTest(TestCase):
         self.assertEqual(response_delete.status_code, 302)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
             reverse('dash:question-delete', args=[1]))
@@ -472,55 +476,24 @@ class QuestionDeleteViewTest(TestCase):
         self.assertEqual(response_get.status_code, 403)
 
     def test_logged_in_with_correct_permission(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response_get = self.client.get(
-            reverse('dash:question-delete', args=[question.pk]))
         # redirects to confirm delete template
-        self.assertEqual(response_get.status_code, 200)
-
-        response_delete = self.client.delete(
-            reverse('dash:question-delete', args=[question.pk]))
-        self.assertEqual(response_delete.status_code,
+        self.assertEqual(self.response_get.status_code, 200)
+        self.assertEqual(self.response_delete.status_code,
                          302)  # redirects after delete
         self.assertFalse(models.Question.objects.filter(
-            pk=question.pk).exists())  # check if the deleted item still exists
+            pk=self.question.pk).exists())  # check if the deleted item still exists
 
     def test_returns_correct_confirm_delete_template(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:question-delete', args=[question.pk]))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response_get.status_code, 200)
         self.assertTemplateUsed(
-            response, 'dashboard/question_confirm_delete.html')
+            self.response_get, 'dashboard/question_confirm_delete.html')
 
     def test_context_object_name(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:question-delete', args=[question.pk]))
-        self.assertTrue('question' in response.context)
+        self.assertTrue('question' in self.response_get.context)
 
     def test_success_message(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.delete(
-            reverse('dash:question-delete', args=[question.pk]))
         # no context data as it redirects
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(get_messages(self.response_delete.wsgi_request))
         self.assertEqual(str(messages[0]), 'Successfully Deleted Question')
 
 
@@ -542,7 +515,24 @@ class QuestionUpdateViewTest(TestCase):
         cls.teacher.teacher = True
         cls.teacher.save()
 
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+        self.question = models.Question.objects.create(
+            question_text='text', quiz=self.quiz)
+        self.response_get = self.client.get(
+            reverse('dash:question-update', args=[self.question.pk]))
+        self.response_put = self.client.post(
+            path=reverse('dash:question-update', args=[self.question.pk]),
+            data={
+                'question_text': 'text updated',
+            }
+        )
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response_get = self.client.get(
             reverse('dash:question-update', args=[1]))
         response_put = self.client.put(
@@ -555,7 +545,7 @@ class QuestionUpdateViewTest(TestCase):
         self.assertEqual(response_put.status_code, 302)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
             reverse('dash:question-update', args=[1]))
@@ -565,40 +555,23 @@ class QuestionUpdateViewTest(TestCase):
         self.assertEqual(response_get.status_code, 403)
 
     def test_logged_in_with_correct_permission(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response_get = self.client.get(
-            reverse('dash:question-update', args=[question.pk]))
-        self.assertEqual(response_get.status_code, 200)
-        response_put = self.client.post(
-            path=reverse('dash:question-update', args=[question.pk]),
-            data={
-                'question_text': 'text updated',
-            }
-        )  # use client.post instead of client.put
-        self.assertEqual(response_put.status_code,
+        self.assertEqual(self.response_put.status_code,
                          302)  # redirects after update
-        question.refresh_from_db()
-        self.assertEqual(question.question_text, 'text updated')
+        self.question.refresh_from_db()
+        self.assertEqual(self.question.question_text, 'text updated')
 
     def test_success_message(self):
-        quiz = models.Quiz.objects.create(quiz_text='text', quiz_title='title')
-        question = models.Question.objects.create(
-            question_text='text', quiz=quiz)
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.post(
-            reverse('dash:question-update', args=[question.pk]),
-            {
-                'question_text': 'text updated',
-            }
-        )
         # no context data as it redirects
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(get_messages(self.response_put.wsgi_request))
         self.assertEqual(str(messages[0]), 'Successfully Updated Question')
+
+    def test_invalid_data(self):
+        response_post = self.client.post(
+            path=reverse('dash:question-update', args=[self.question.pk]),
+            data={}
+        )
+        # should redirect with status code 302 not 200
+        self.assertEqual(response_post.status_code, 200)
 
 
 class QuizQuestionsListViewTest(TestCase):
@@ -626,7 +599,14 @@ class QuizQuestionsListViewTest(TestCase):
             models.Question.objects.create(
                 question_text=f'text {i}', quiz=cls.quiz)
 
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(
+            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response = self.client.get(
             reverse('dash:quiz-questions', args=[self.quiz.pk]))
         self.assertRedirects(
@@ -634,35 +614,24 @@ class QuizQuestionsListViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_logged_in_with_correct_permission(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:quiz-questions', args=[self.quiz.pk]))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.response.status_code, 200)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response = self.client.get(
             reverse('dash:quiz-questions', args=[self.quiz.pk]))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:quiz-questions', args=[self.quiz.pk]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dashboard/quiz_question_list.html')
+        self.assertEqual(self.response.status_code, 200)
+        self.assertTemplateUsed(
+            self.response, 'dashboard/quiz_question_list.html')
 
     def test_context_object(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response = self.client.get(
-            reverse('dash:quiz-questions', args=[self.quiz.pk]))
-        self.assertTrue('questions' in response.context)
+        self.assertTrue('questions' in self.response.context)
         self.assertCountEqual(
-            response.context['questions'], self.quiz.questions.all())
+            self.response.context['questions'], self.quiz.questions.all())
 
 
 class ChoiceUpdateViewTest(TestCase):
@@ -690,8 +659,20 @@ class ChoiceUpdateViewTest(TestCase):
             question_text='text', quiz=self.quiz)
         self.choice = models.Choice.objects.create(
             choice_text='text', question=self.question)
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response_get = self.client.get(
+            reverse('dash:choice-update', args=[self.choice.pk]))
+        self.response_put = self.client.post(
+            reverse('dash:choice-update', args=[self.choice.pk]),
+            {
+                'mark': 'wrong',
+                'choice_text': 'text updated',
+            }
+        )
 
     def test_redirect_if_not_logged_in(self):
+        self.client.logout()
         response_get = self.client.get(
             reverse('dash:choice-update', args=[1]))
         response_put = self.client.put(
@@ -704,7 +685,7 @@ class ChoiceUpdateViewTest(TestCase):
         self.assertEqual(response_put.status_code, 302)
 
     def test_logged_in_but_not_correct_permission(self):
-        _ = self.client.login(
+        self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
             reverse('dash:choice-update', args=[1]))
@@ -714,33 +695,286 @@ class ChoiceUpdateViewTest(TestCase):
         self.assertEqual(response_get.status_code, 403)
 
     def test_logged_in_with_correct_permission(self):
-        _ = self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        response_get = self.client.get(
-            reverse('dash:choice-update', args=[self.choice.pk]))
-        self.assertEqual(response_get.status_code, 200)
-        response_put = self.client.post(
-            path=reverse('dash:choice-update', args=[self.choice.pk]),
-            data={
-                'choice_text': 'text updated',
-                'mark': 'wrong'
-            }
-        )  # use client.post instead of client.put
-        self.assertEqual(response_put.status_code,
+        self.assertEqual(self.response_get.status_code, 200)
+        # use client.post instead of client.put
+        self.assertEqual(self.response_put.status_code,
                          302)  # redirects after update
         self.choice.refresh_from_db()
         self.assertEqual(self.choice.choice_text, 'text updated')
 
     def test_success_message(self):
-        _ = self.client.login(
+        # no context data as it redirects
+        messages = list(get_messages(self.response_put.wsgi_request))
+        self.assertEqual(str(messages[0]), 'Successfully Updated Choice')
+
+    def test_invalid_data(self):
+        response_post = self.client.post(
+            path=reverse('dash:choice-update', args=[self.choice.pk]),
+            data={}
+        )
+        self.assertEqual(response_post.status_code, 200)
+
+
+class CreateQuizViewTest(TestCase):
+    """
+    Test Create Quiz View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create student ###
+        cls.student = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+    def setUp(self):
+        self.client.login(
             email='teacher@test.com', password='asdf7890')
-        response = self.client.post(
-            reverse('dash:choice-update', args=[self.choice.pk]),
-            {
-                'mark': 'wrong',
-                'choice_text': 'text updated',
+        self.response_get = self.client.get(
+            reverse('dash:create-quiz'))
+
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response_get = self.client.get(
+            reverse('dash:create-quiz'))
+        response_post = self.client.post(
+            reverse('dash:create-quiz'))
+        self.assertRedirects(
+            response_get, '/login/?next=/dashboard/create-quiz/')
+        self.assertRedirects(
+            response_post, '/login/?next=/dashboard/create-quiz/')
+        self.assertEqual(response_get.status_code, 302)
+        self.assertEqual(response_post.status_code, 302)
+
+    def test_logged_in_but_not_correct_permission(self):
+        self.client.login(
+            email='student@test.com', password='asdf7890')
+        response_get = self.client.get(
+            reverse('dash:create-quiz'))
+        response_post = self.client.post(
+            reverse('dash:create-quiz'))
+        self.assertEqual(response_post.status_code, 403)
+        self.assertEqual(response_get.status_code, 403)
+
+    def test_logged_in_with_correct_permission(self):
+        self.assertEqual(self.response_get.status_code, 200)
+        self.assertTemplateUsed(
+            self.response_get, 'dashboard/create_quiz.html')
+
+        ### test request.POST['finish'] ###
+        response_post = self.client.post(
+            path=reverse('dash:create-quiz'),
+            data={
+                'quiz_text': 'quiz text finish',
+                'quiz_title': 'quiz title',
+                'duration': timedelta(minutes=25),
+                'finish': True,
             }
         )
-        # no context data as it redirects
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), 'Successfully Updated Choice')
+        ### redirects after post ###
+        self.assertEqual(response_post.status_code, 302)
+        self.assertEqual(models.Quiz.objects.get(
+            quiz_text='quiz text finish').quiz_text, 'quiz text finish')
+
+        ### test request.POST['finish'] is None ###
+        response_post = self.client.post(
+            path=reverse('dash:create-quiz'),
+            data={
+                'quiz_text': 'quiz text',
+                'quiz_title': 'quiz title',
+                'duration': timedelta(minutes=25),
+            }
+        )
+        self.assertEqual(response_post.status_code, 200)
+        self.assertTemplateUsed(response_post, 'dashboard/create_quiz.html')
+
+        ### test request.POST['continue'] ###
+        response_post = self.client.post(
+            path=reverse('dash:create-quiz'),
+            data={
+                'quiz_text': 'quiz text continue',
+                'quiz_title': 'quiz title',
+                'duration': timedelta(minutes=25),
+                'continue': True,
+            }
+        )
+        self.assertEqual(response_post.status_code, 200)
+        self.assertEqual(models.Quiz.objects.get(
+            quiz_text='quiz text continue').quiz_text, 'quiz text continue')
+        self.assertContains(response_post, models.Quiz.objects.get(
+            quiz_text='quiz text continue').pk)
+
+    def test_invalid_data(self):
+        response_post = self.client.post(reverse('dash:create-quiz'), data={})
+        self.assertEqual(response_post.status_code, 200)
+        self.assertEqual(models.Quiz.objects.count(), 0)
+
+
+class CreateQuestionAndChoiceViewTest(TestCase):
+    """
+    Test Create Question and Choice View
+    """
+
+    # set up test data
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create student ###
+        cls.student = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+        ### create quiz ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_text='text', quiz_title='title')
+
+    # set up modifables
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response_get = self.client.get(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+
+    # test if not login
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response_get = self.client.get(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+        response_post = self.client.post(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+        self.assertRedirects(
+            response_get, f'/login/?next=/dashboard/quiz/{self.quiz.pk}/create-question-choice/')
+        self.assertRedirects(
+            response_post, f'/login/?next=/dashboard/quiz/{self.quiz.pk}/create-question-choice/')
+        self.assertEqual(response_get.status_code, 302)
+        self.assertEqual(response_post.status_code, 302)
+
+    # test login and render the correct template
+    def test_logged_in_with_correct_permission(self):
+        self.assertEqual(self.response_get.status_code, 200)
+        self.assertTemplateUsed(
+            self.response_get, 'dashboard/create_quiz.html')
+
+    # test permission
+    def test_logged_in_but_not_correct_permission(self):
+        self.client.login(
+            email='student@test.com', password='asdf7890')
+        response_get = self.client.get(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+        response_post = self.client.post(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+        self.assertEqual(response_post.status_code, 403)
+        self.assertEqual(response_get.status_code, 403)
+
+    # test context for forms
+    def test_context_object(self):
+        self.assertTrue('QuestionForm' in self.response_get.context)
+        self.assertTrue('ChoiceForm' in self.response_get.context)
+        # check that the no choice forms is 4
+        self.assertEqual(len(self.response_get.context['ChoiceForm']), 4)
+
+    # test only question form is valid
+    def test_one_form_valid(self):
+        """
+        Only question form is valid, so the form is re-rendered
+        """
+        response_post = self.client.post(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            {
+                'question_text': 'question text',
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MAX_NUM_FORMS': 4,
+                'form-MIN_NUM_FORMS': 0,
+                'finish': True,
+            }
+        )
+        self.assertEqual(response_post.status_code, 200)
+        self.assertTemplateUsed(response_post, 'dashboard/create_quiz.html')
+
+    # test both choice and question forms valid and POST['finish']
+    def test_both_forms_valid_and_finish_button_click(self):
+        ### create dummy post data ###
+        response_post = self.client.post(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            {
+                'form-0-choice_text': 'choice0',
+                'form-1-choice_text': 'choice1',
+                'form-2-choice_text': 'choice2',
+                'form-3-choice_text': 'choice3',
+                'form-0-mark': 'wrong',
+                'form-1-mark': 'wrong',
+                'form-2-mark': 'wrong',
+                'form-3-mark': 'wrong',
+                'question_text': 'question text',
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MAX_NUM_FORMS': 4,
+                'form-MIN_NUM_FORMS': 0,
+                'finish': True,
+            }
+        )
+        self.assertEqual(response_post.status_code, 302)
+        self.assertRedirects(response_post, '/dashboard/quizzes/')
+
+    def test_both_forms_valid_and_continue_button_click(self):
+        response_post = self.client.post(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            {
+                'form-0-choice_text': 'choice0',
+                'form-1-choice_text': 'choice1',
+                'form-2-choice_text': 'choice2',
+                'form-3-choice_text': 'choice3',
+                'form-0-mark': 'wrong',
+                'form-1-mark': 'wrong',
+                'form-2-mark': 'wrong',
+                'form-3-mark': 'wrong',
+                'question_text': 'question text',
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MAX_NUM_FORMS': 4,
+                'form-MIN_NUM_FORMS': 0,
+                'continue': True,
+            }
+        )
+        self.assertEqual(response_post.status_code, 200)
+        # test success message
+        messages = list(get_messages(response_post.wsgi_request))
+        self.assertEqual(
+            str(messages[0]), 'SuccessFully Created Question and Choices')
+
+    def test_both_forms_valid_and_no_finish_or_continue_button_click(self):
+        ### create dummy post data ###
+        response_post = self.client.post(
+            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            {
+                'form-0-choice_text': 'choice0',
+                'form-1-choice_text': 'choice1',
+                'form-2-choice_text': 'choice2',
+                'form-3-choice_text': 'choice3',
+                'form-0-mark': 'wrong',
+                'form-1-mark': 'wrong',
+                'form-2-mark': 'wrong',
+                'form-3-mark': 'wrong',
+                'question_text': 'question text',
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MAX_NUM_FORMS': 4,
+                'form-MIN_NUM_FORMS': 0,
+            }
+        )
+        self.assertEqual(response_post.status_code, 200)
+        self.assertTemplateUsed(response_post, 'dashboard/create_quiz.html')

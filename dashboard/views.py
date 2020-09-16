@@ -199,7 +199,6 @@ class ChoiceUpdateView(
 class CreateQuiz(
     LoginRequiredMixin,
     UserPassesTestMixin,
-    SuccessMessageMixin,
     generic.edit.FormView
 ):
     def get(self, request):
@@ -217,9 +216,9 @@ class CreateQuiz(
             qf = quizForm.save(commit=False)
             qf.save()
 
-            if request.POST.get('finish', None):
-                return redirect(reverse('dash:quiz-list'), permanent=True)
-            if request.POST.get('continue', None):
+            if request.POST.get('finish'):
+                return redirect(reverse('dash:quiz-list'))
+            if request.POST.get('continue'):
                 return HttpResponse(qf.pk)
                 # return redirect(reverse('dash:create-question-answer'), permanent=True)
         return render(request, 'dashboard/create_quiz.html', {'form': quizForm})
@@ -232,12 +231,10 @@ class CreateQuiz(
 
 
 class CreateQuestionAndChoice(
-    UserPassesTestMixin,
     LoginRequiredMixin,
-    SuccessMessageMixin,
+    UserPassesTestMixin,
     generic.edit.FormView
 ):
-
     ChoiceFormSet = formset_factory(ChoiceForm, extra=4, max_num=4)
 
     def get(self, request, *args, **kwargs):
@@ -269,8 +266,9 @@ class CreateQuestionAndChoice(
                 instance.question = qf
                 instance.save()
             if request.POST.get('finish', None):
-                return redirect(reverse('dash:quiz-list'), permanent=True)
+                return redirect(reverse('dash:quiz-list'))
             if request.POST.get('continue', None):
+                messages.success(request, 'SuccessFully Created Question and Choices')                
                 return HttpResponse(qz.pk)
         return render(request, 'dashboard/create_quiz.html', context)
 
