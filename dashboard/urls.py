@@ -40,24 +40,3 @@ urlpatterns = [
          views.CreateQuestionAndChoice.as_view(), name='create-question-choice')
 
 ]
-
-
-# REDUNDANT
-
-#     path('quiz/create/', views.QuizCreateView.as_view(), name='quiz-create'),
-#     path('question/', views.QuestionListView.as_view(), name='question-list'),
-#     path('question/<int:pk>/', views.QuestionDetailView.as_view(),
-#          name='question-detail'),
-#     path('choice/<int:pk>/delete/',
-#          views.ChoiceDeleteView.as_view(), name='choice-delete'),
-#     path('question/create/', views.QuestionCreateView.as_view(),
-#          name='question-create'),
-#     path('quiz/<int:pk>/create-question/',
-#          views.QuizQuestionCreateView.as_view(), name='quiz-question-create'),
-
-
-### choices for question ###
-#     path('question/<int:pk>/create-choice/',
-#          views.QuestionChoiceCreateView.as_view(), name='question-choice-create'),
-#     path('question/<int:pk>/choices/',
-#          views.QuestionChoicesListView.as_view(), name='question-choices'),
