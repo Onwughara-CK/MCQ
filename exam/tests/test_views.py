@@ -163,7 +163,7 @@ class ExamResultViewTest(TestCase):
         cls.quiz = models.Quiz.objects.create(
             quiz_title='title 1', quiz_text='text 1')
 
-        ### create 10 questions ###
+        ### create 10 questions and for choices for each question ###
         for i in range(1, 11):
             cls.question = models.Question.objects.create(
                 question_text=f'question text {i}', quiz=cls.quiz)
@@ -256,3 +256,59 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.context['no_of_correct_choices_answered'], 2)
         self.assertEqual(response.context['no_of_questions_answered'], 2)
         self.assertEqual(response.context['score_percent'], 20)
+
+
+# test ajax get and post
+# test quiz duration, create quiz and send pk
+# test 404 with wrong pk
+class ExamTimerViewTest(TestCase):
+    """
+    Test Exam Timer View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+        ### create Quiz ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_title='title 1', quiz_text='text 1', duration=timedelta(minutes=25))
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(reverse('exam:timer'))
+
+    def test_not_ajax(self):
+        self.assertEqual(self.response.status_code, 404)
+        # post
+        response = self.client.post(reverse('exam:timer'))
+        self.assertEqual(response.status_code, 404)
+
+    def test_with_ajax_get(self):
+        response = self.client.get(
+            reverse('exam:timer'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+
+    def test_logged_in_with_ajax_post_with_invalid_data(self):
+        response = self.client.post(
+            reverse('exam:timer'),
+            data={},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_logged_in_with_ajax_post_with_valid_data(self):
+        response = self.client.post(
+            reverse('exam:timer'),
+            data={
+                'pk': self.quiz.pk,
+            },
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )        
+        self.assertEqual(response.status_code, 200)

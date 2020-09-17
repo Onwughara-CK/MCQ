@@ -90,11 +90,12 @@ class ExamResultView(LoginRequiredMixin, View):
 
 
 class ExamTimerView(View):
+    timer = {}
 
     def get(self, request):
         if not request.is_ajax():
             raise Http404
-        return HttpResponse(ExamTimerView.deadline_in_ms)
+        return HttpResponse(self.timer.get('deadline_in_ms'))
 
     def post(self, request):
         exam_duration = get_object_or_404(
@@ -102,7 +103,7 @@ class ExamTimerView(View):
         delta = parse_duration(str(exam_duration))
 
         deadline = timezone.now() + delta
-        ExamTimerView.deadline_in_ms = int(deadline.timestamp()*1000)
+        self.timer['deadline_in_ms'] = int(deadline.timestamp()*1000)
         if not request.is_ajax():
             raise Http404
-        return HttpResponse(ExamTimerView.deadline_in_ms)
+        return HttpResponse(self.timer.get('deadline_in_ms'))
