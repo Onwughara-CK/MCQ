@@ -217,7 +217,8 @@ class CreateQuiz(
             qf.save()
 
             if request.POST.get('finish'):
-                return redirect(reverse('dash:quiz-list'))
+                # return redirect(reverse('dash:quiz-list'))
+                return HttpResponse(status=302)
             if request.POST.get('continue'):
                 return HttpResponse(qf.pk)
                 # return redirect(reverse('dash:create-question-answer'), permanent=True)
@@ -268,7 +269,8 @@ class CreateQuestionAndChoice(
             if request.POST.get('finish', None):
                 return redirect(reverse('dash:quiz-list'))
             if request.POST.get('continue', None):
-                messages.success(request, 'SuccessFully Created Question and Choices')                
+                messages.success(
+                    request, 'SuccessFully Created Question and Choices')
                 return HttpResponse(qz.pk)
         return render(request, 'dashboard/create_quiz.html', context)
 

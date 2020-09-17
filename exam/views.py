@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import generic, View
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, Http404
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
 
@@ -42,12 +42,16 @@ class ExamResultView(LoginRequiredMixin, View):
         for k, v in request.session.items():
             if "Question" in k:
                 data[k] = v
+        if not request.is_ajax():
+            raise Http404
         return JsonResponse(data)
 
     def post(self, request):
         for k, v in request.POST.items():
             request.session[k] = v
         if request.POST.get('finish'):
+            if request.is_ajax():
+                raise Http404
             correct_choices = Choice.objects.filter(
                 question__quiz__pk=request.POST.get('quiz_pk')).filter(mark='right')
             result = {
@@ -76,18 +80,20 @@ class ExamResultView(LoginRequiredMixin, View):
             for _, v in corrections.items():
                 corrections_list.append(v)
             result['corrections'] = corrections_list
-            result['score_percent'] = result['no_of_correct_choices_answered'] / \
-                result['no_of_questions'] * 100
+            result['score_percent'] = int(result['no_of_correct_choices_answered'] /
+                                          result['no_of_questions'] * 100)
             for key in list(request.session.keys()):
                 if not key.startswith('_'):
                     del request.session[key]
             return render(request, 'exam/result_sheet.html', result)
-        return HttpResponse('works')
+        return HttpResponse(status=204)
 
 
 class ExamTimerView(View):
 
     def get(self, request):
+        if not request.is_ajax():
+            raise Http404
         return HttpResponse(ExamTimerView.deadline_in_ms)
 
     def post(self, request):
@@ -97,5 +103,6 @@ class ExamTimerView(View):
 
         deadline = timezone.now() + delta
         ExamTimerView.deadline_in_ms = int(deadline.timestamp()*1000)
-
+        if not request.is_ajax():
+            raise Http404
         return HttpResponse(ExamTimerView.deadline_in_ms)

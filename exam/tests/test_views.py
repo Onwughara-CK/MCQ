@@ -16,10 +16,6 @@ class ExamListViewTest(TestCase):
     def setUpTestData(cls):
         cls.client = Client()
 
-        ### create student ###
-        cls.student = get_user_model().objects.create_user(
-            email='student@test.com', password='asdf7890')
-
         ### create teacher ###
         cls.teacher = get_user_model().objects.create_user(
             email='teacher@test.com', password='asdf7890',)
@@ -65,10 +61,6 @@ class ExamInstructionsViewTest(TestCase):
     def setUpTestData(cls):
         cls.client = Client()
 
-        ### create student ###
-        cls.student = get_user_model().objects.create_user(
-            email='student@test.com', password='asdf7890')
-
         ### create teacher ###
         cls.teacher = get_user_model().objects.create_user(
             email='teacher@test.com', password='asdf7890',)
@@ -98,3 +90,169 @@ class ExamInstructionsViewTest(TestCase):
 
     def test_returns_correct_template(self):
         self.assertTemplateUsed(self.response, 'exam/exam_instructions.html')
+
+
+class ExamQuestionsListViewTest(TestCase):
+    """
+    Test Exam Questions List View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+        ### create Quiz ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_title='title 1', quiz_text='text 1')
+
+        ### create 10 questions ###
+        for i in range(1, 11):
+            models.Question.objects.create(
+                question_text=f'question text {i}', quiz=cls.quiz)
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(
+            reverse('exam:exam-questions-list', args=[self.quiz.pk]))
+
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(
+            reverse('exam:exam-questions-list', args=[self.quiz.pk]))
+        self.assertRedirects(response, f'/login/?next=/exam/{self.quiz.pk}/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in(self):
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_returns_correct_template(self):
+        self.assertTemplateUsed(self.response, 'exam/exam_questions.html')
+
+    def test_context_object(self):
+        self.assertEqual(self.response.context['quiz_pk'], self.quiz.pk)
+        self.assertIn('questions', self.response.context)
+
+    def test_pagination(self):
+        self.assertTrue(self.response.context['is_paginated'])
+        self.assertEqual(
+            self.response.context['paginator'].count, self.quiz.questions.count())
+        self.assertEqual(self.response.context['paginator'].per_page, 1)
+
+
+class ExamResultViewTest(TestCase):
+    """
+    Test Exam Result View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+        ### create Quiz ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_title='title 1', quiz_text='text 1')
+
+        ### create 10 questions ###
+        for i in range(1, 11):
+            cls.question = models.Question.objects.create(
+                question_text=f'question text {i}', quiz=cls.quiz)
+            for i in range(1, 5):
+                if i == 3:
+                    models.Choice.objects.create(
+                        choice_text=f'choice {i}',
+                        mark='right',
+                        question=cls.question,
+                    )
+                models.Choice.objects.create(
+                    choice_text=f'choice {i}',
+                    mark='wrong',
+                    question=cls.question,
+                )
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(reverse('exam:exam-result'))
+
+    # test not login
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(reverse('exam:exam-result'))
+        self.assertRedirects(response, f'/login/?next=/exam/result/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_but_not_ajax(self):
+        self.assertEqual(self.response.status_code, 404)
+        # post
+        response = self.client.post(reverse('exam:exam-result'))
+        self.assertEqual(response.status_code, 204)
+
+    def test_logged_in_with_ajax_get(self):
+        response = self.client.get(
+            reverse('exam:exam-result'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        # receive json bytes, so decode byte to json and check
+        self.assertJSONEqual(response.content.decode(), {})
+
+    # test post as ajax without finish
+    def test_logged_in_with_ajax_post_not_finish(self):
+        response = self.client.post(
+            reverse('exam:exam-result'),
+            data={},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 204)
+
+    def test_logged_in_with_ajax_post_and_finish(self):
+        response = self.client.post(
+            reverse('exam:exam-result'),
+            data={
+                'finish': True,
+                'quiz_pk': self.quiz.pk,
+            },
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_logged_in_without_ajax_post_but_finish(self):
+        response = self.client.post(
+            reverse('exam:exam-result'),
+            data={
+                'finish': True,
+                'quiz_pk': self.quiz.pk,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'exam/result_sheet.html')
+        self.assertEqual(response.context['no_of_questions'], 10)
+        self.assertEqual(response.context['no_of_correct_choices_answered'], 0)
+        self.assertEqual(response.context['no_of_questions_answered'], 0)
+        self.assertEqual(response.context['score_percent'], 0)
+
+    def test_logged_in_without_ajax_post_and_finish_with_correct_choices(self):
+        response = self.client.post(
+            reverse('exam:exam-result'),
+            data={
+                'finish': True,
+                'quiz_pk': self.quiz.pk,
+                'Question1': models.Choice.objects.filter(mark='right').first().pk,
+                'Question2': models.Choice.objects.filter(mark='right').last().pk,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'exam/result_sheet.html')
+        self.assertEqual(response.context['no_of_questions'], 10)
+        self.assertEqual(response.context['no_of_correct_choices_answered'], 2)
+        self.assertEqual(response.context['no_of_questions_answered'], 2)
+        self.assertEqual(response.context['score_percent'], 20)
