@@ -2,7 +2,7 @@ from django.test import SimpleTestCase
 from django.urls import resolve, reverse
 
 
-from dashboard import views, models
+from dashboard import views
 
 
 class UrlTest(SimpleTestCase):
