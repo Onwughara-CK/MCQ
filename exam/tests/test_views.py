@@ -8,9 +8,9 @@ from django.contrib.messages import get_messages
 from dashboard import models
 
 
-class QuizListViewTest(TestCase):
+class ExamListViewTest(TestCase):
     """
-    Test Quiz List View
+    Test Exam List View
     """
     @classmethod
     def setUpTestData(cls):
@@ -54,3 +54,47 @@ class QuizListViewTest(TestCase):
         self.assertContains(self.response, 'title 10')
         self.assertCountEqual(
             self.response.context['exams'], models.Quiz.objects.all())
+
+
+class ExamInstructionsViewTest(TestCase):
+    """
+    Test Exam Instruction View
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+        ### create student ###
+        cls.student = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
+        ### create teacher ###
+        cls.teacher = get_user_model().objects.create_user(
+            email='teacher@test.com', password='asdf7890',)
+        cls.teacher.teacher = True
+        cls.teacher.save()
+
+        ### create Quiz ###
+        cls.quiz = models.Quiz.objects.create(
+            quiz_title='title 1', quiz_text='text 1')
+
+    def setUp(self):
+        self.client.login(
+            email='teacher@test.com', password='asdf7890')
+        self.response = self.client.get(
+            reverse('exam:exam-instruction', args=[self.quiz.pk]))
+
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(
+            reverse('exam:exam-instruction', args=[self.quiz.pk]))
+        self.assertRedirects(
+            response, f'/login/?next=/exam/{self.quiz.pk}/instructions/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_with_correct_permission(self):
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_returns_correct_template(self):
+        self.assertTemplateUsed(self.response, 'exam/exam_instructions.html')

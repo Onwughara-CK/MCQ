@@ -14,7 +14,7 @@ class ExamListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'exams'
 
 
-class ExamInstructionsView(View):
+class ExamInstructionsView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         exam = get_object_or_404(Quiz, pk=kwargs['pk'])
         return render(request, 'exam/exam_instructions.html', {'exam': exam})

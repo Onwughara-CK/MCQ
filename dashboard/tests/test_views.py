@@ -48,7 +48,6 @@ class DashViewTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
-        self.assertEqual(self.response.status_code, 200)
         self.assertTemplateUsed(self.response, 'dashboard/dash.html')
 
 
