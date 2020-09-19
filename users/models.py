@@ -27,12 +27,7 @@ class CustomUserManager(BaseUserManager):
         """
         use to create super user
         """
-
-        if not email:
-            raise ValueError("Please provide a valid email")
-        email = self.normalize_email(email)
-        user = self.model(email=email)
-        user.set_password(password)
+        user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
