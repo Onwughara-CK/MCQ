@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}
 Welcome
 {% endblock title %}
@@ -22,8 +21,6 @@ Welcome
                 Take Quiz
             </a>
             {% endif %}
-
-
             {% else %}
             <a href="{% url 'users:login' %}">
                 Login
