@@ -8,5 +8,5 @@ install:
 # command to run tests
 script:
   - python manage.py test
-  - coverage run manage.py test
+  - coverage run --source=dashboard, exam, users manage.py test
 after_success: coveralls
