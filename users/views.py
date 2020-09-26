@@ -13,12 +13,12 @@ class IndexView(View):
 
 class RegisterView(FormView):
     def get(self, request):
-        form = RegisterForm
+        form = RegisterForm()
         context = {
             'form': form,
             'title': 'Register'
         }
-        return render(request, 'users/gate.html', context)
+        return render(request, 'users/register.html', context)
 
     def post(self, request):
         form = RegisterForm(request.POST)
@@ -27,4 +27,4 @@ class RegisterView(FormView):
             user.save()
             login(request, user)
             return redirect(reverse('users:home'))
-        return render(request, 'users/gate.html', {'form': form})
+        return render(request, 'users/register.html', {'form': form})
