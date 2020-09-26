@@ -14,15 +14,15 @@ from .models import Quiz, Choice, Question
 from .forms import QuizForm, QuestionForm, ChoiceForm
 
 
-class DashView(LoginRequiredMixin, UserPassesTestMixin, View):
+class DashView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'dashboard/dash.html')
 
-    def test_func(self):
-        user = self.request.user
-        if not user.teacher:
-            raise PermissionDenied
-        return True
+    # def test_func(self):
+    #     user = self.request.user
+    #     if not user.teacher:
+    #         raise PermissionDenied
+    #     return True
 
 
 class QuizListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):

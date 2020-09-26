@@ -1,10 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}
-Welcome
+    Welcome
 {% endblock title %}
 
-
 {% block content %}
+        <div class="row mt-5 justify-content-center">
+            <div class="col-10 text-center">
+                <h1 class="display-4">Quizoo - Multi Choice Quiz App</h1>
+                <p class="h3 font-weight-normal">
+                    With Quizoo, practise and create MCQ/quizzes easily
+                </p>
+            </div>
+        </div>    
+        <div class="row mt-5 justify-content-center">
+            <div class="col-10 col-md-8 d-flex justify-content-center flex-sm-row flex-column">
+                <a class="btn mx-1 btn-outline-danger mb-1 flex-fill" href="{% url 'users:register' %}">Register</a>
+                <a class="btn mx-1 btn-outline-info mb-1 flex-fill" href="{% url 'users:login' %}">Login</a>
+                <a class="btn mx-1 btn-outline-success mb-1 flex-fill" href="#">Sample Quiz</a>
+            </div>
+        </div>
+{% endblock content %}
+
+<!-- 
 <div>
     <div>
         <h3>
@@ -32,4 +49,4 @@ Welcome
         </h3>
     </div>
 </div>
-{% endblock content %}
+ -->

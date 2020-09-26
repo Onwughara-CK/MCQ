@@ -1,20 +1,51 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Admin - Dashboard
+    Admin - Dashboard
 {% endblock title %}
-
-
-{% block page_title %}
-<h2>Dashboard</h2>
-{% endblock page_title %}
-
 
 {% block content %}
 
-<h3>
+    <div class="row mt-5 justify-content-center">
+        <div class="col-10 text-center">
+            <h1 class="display-4">Quizoo - Multi Choice Quiz App</h1>
+            <p class="h3 font-weight-normal">
+                With Quizoo, practise and create MCQ/quizzes easily
+            </p>
+        </div>
+    </div>
+    <!-- if user is authenticated -->
+    {% if user.is_authenticated %}
+
+        <!-- if user is teacher -->
+        {% if user.teacher %}
+
+            <div class="row mt-5 justify-content-center">
+                <div class="col-10 col-sm-8 d-flex justify-content-center flex-sm-row flex-column">
+                    <a class="btn mx-1 btn-outline-info mb-1 flex-fill" href="{% url 'dash:create-quiz' %}" >Create Quiz</a>
+                    <a class="btn mx-1 btn-outline-info mb-1 flex-fill" href="{% url 'dash:quiz-list' %}" >See list of Quizzes</a>
+                </div>
+            </div>
+        {% else %}
+
+            <!-- if user is not teacher -->
+            <div class="row mt-5 justify-content-center">
+                <div class="col-10 col-md-8 d-flex justify-content-center flex-sm-row flex-column">
+                    <a class="btn mx-1 btn-outline-info mb-1 flex-fill" href="#" >Sample Quiz</a>
+                    <a class="btn mx-1 btn-outline-info mb-1 flex-fill" href="#" >Select Quiz To Practise</a>
+                    <a class="btn mx-1 btn-outline-info mb-1 flex-fill" href="#" >Results</a>
+                </div>
+            </div>
+
+        {% endif %}        
+        
+
+    {% endif %}
+
+{% endblock content %}
+
+<!-- <h3>
     <a href="{% url 'dash:create-quiz' %}">Create Quiz</a> |
     <a href="{% url 'dash:quiz-list' %}">Quiz List</a> |
     <a href="{% url 'users:logout' %}">Logout</a>
-</h3>
-{% endblock content %}
+</h3> -->
