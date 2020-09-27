@@ -8,7 +8,6 @@ $(function () {
         var now = new Date().getTime();
         var duration = deadline - now;
 
-        var days = Math.floor(duration / (1000 * 60 * 60 * 24));
         var hours = Math.floor(
           (duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
         );
@@ -16,10 +15,10 @@ $(function () {
         var seconds = Math.floor((duration % (1000 * 60)) / 1000);
 
         $('#timer').text(
-          days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's '
+          ((hours < 10? '0':'') + hours) + ':' +  ((minutes < 10? '0':'') + minutes)  + ':' + ((seconds < 10? '0':'') +  seconds)
         );
 
-        if (duration <= 0) {
+        if (duration < 1) {
           clearInterval(x);
           $('input#finish').click();
         }

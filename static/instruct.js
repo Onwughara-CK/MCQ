@@ -1,7 +1,7 @@
 $(function () {
   var pk = () => $("[name='pk']").val();
   
-  $('#exam_questions').click(function (e) {
+  $('a#exam_questions').click(function (e) {
     $.ajax({
       type: 'POST',
       url: '/exam/timer/',

@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # Third party apps
     'widget_tweaks',
 
-    # your apps
+    # project apps
     'users.apps.UsersConfig',
     'dashboard.apps.DashboardConfig',
     'exam.apps.ExamConfig',

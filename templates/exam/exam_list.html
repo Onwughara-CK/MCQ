@@ -2,36 +2,39 @@
 {% load static %}
 
 {% block title %}
-Dashboard - Exam
+ Exam List
 {% endblock title %}
 
-
-{% block page_title %}
-<h2>Exam Hall</h2>
-
-{% endblock page_title %}
-
-
 {% block content %}
-
-
-{% if exams %}
-
-{% for exam in exams %}
-<p>
-    <a id='exam_list' href="{% url 'exam:exam-instruction' exam.pk %}">{{ exam.quiz_title }}</a> |
-    <span>({{ exam.questions.count }}
-        question{{ exam.questions.count|pluralize }})</span> |
-    <span>Duration : {{ exam.duration }}</span>
-</p>
-{% endfor %}
-
-{% endif %}
-
+<div class="row mt-5 justify-content-center">
+    <div class="col-10">       
+        {% if exams %}
+            <div class="card">            
+                <div class="card-body">
+                    <h4 class="display-4">Choose one Quiz below to begin</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for exam in exams %}
+                    <li class="list-group-item">                   
+                            <a                     
+                                id='exam_list' 
+                                href="{% url 'exam:exam-instruction' exam.pk %}"
+                            >
+                                <span class="text-primary">{{ exam.quiz_title }}</span>
+                            </a>             
+                                |
+                                <span>{{ exam.questions.count }} question{{ exam.questions.count|pluralize }}</span>
+                                |
+                                <span>Duration : 0{{ exam.duration }}</span>
+                        </p>          
+                    </li>
+                    {% endfor %}        
+                </ul>
+            </div>
+        {% else %}        
+            <h1 class="display-4">No Quiz.</h1>               
+        {% endif %}   
+    </div>
+</div>
 {% endblock content %}
 
-{% block js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<script src="{% static 'exam.js' %}"></script>
-{% endblock js %}
