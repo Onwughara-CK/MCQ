@@ -1,42 +1,57 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    Result
+{% endblock title %}
+
 {% block content %}
-{% if corrections %}
-<div style="margin-bottom: 10px; border: 1px black solid;">
-    <p>
-        <h2>Email : {{ user.email }}</h2>
-    </p>
-    <p>
-        Percentage : {{ score_percent |floatformat:"0" }} %
-    </p>
+    <div class="row mt-5 justify-content-center">
+        <div class="col-10">
+            {% if corrections %}
+                <div class="card border-primary">            
+                    <div class="card-body">
+                        <h4 class="display-4 text-center">Result</h4>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Email : {{ user.email }}</li>
+                        <li class="list-group-item">Percentage : {{ score_percent }} %</li>
+                        <li class="list-group-item">No of questions :{{ no_of_questions }}</li>
+                        <li class="list-group-item">No of Correct Answers Chosen: {{ no_of_correct_choices_answered }}</li>
+                        <li class="list-group-item">No of Questions Answered: {{ no_of_questions_answered }}</li>
+                    </ul>
+                </div>                    
+                {% for correction in corrections %}
+                    <div 
+                        class="card my-2 
+                        {% if correction.correct_choice == correction.your_choice %}
+                            border-success
+                        {% else %}
+                            border-danger
+                        {% endif %}
+                        "
+                        style="border-width: 2px;"
+                    >
+                        <div class="card-header text-muted">
+                            Question: {{correction.question}}
+                        </div>                               
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Correct Answer: {{correction.correct_choice}}</li>
+                            <li class="list-group-item">Your Answer: {{correction.your_choice}}</li>
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h3>You Have Not Taken Exam. Click the link below</h3>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-5 justify-content-center">
+        <a 
+            class="btn btn-outline-primary my-5" 
+            href="{% url 'exam:exam-list' %}"
+        >
+            Back To Exam list
+        </a>
+    </div>
 
-    <p>
-        No of questions :{{ no_of_questions }}
-    </p>
-    <p>
-        No of Correct Answers Chosen: {{ no_of_correct_choices_answered }}
-    </p>
-    <p>
-        No of Questions Answered: {{ no_of_questions_answered }}
-    </p>
-</div>
-{% for correction in corrections %}
-<div style="margin-bottom: 10px; border: 1px black solid;">
-    <p>
-        Question: {{correction.question}}
-    </p>
-    <p>
-        Correct Answer: {{correction.correct_choice}}
-    </p>
-    <p>
-        Your Answer: {{correction.your_choice}}
-    </p>
-</div>
-{% endfor %}
-{% else %}
-<h3>You Have Not Taken Exam. Click the link below</h3>
-{% endif %}
-
-
-<a href="{% url 'exam:exam-list' %}">Back To Exam list</a>
 {% endblock content %}

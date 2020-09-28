@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Admin - Dashboard
+
+    {% if user.teacher %}
+        Teacher
+    {% else %}
+        Student
+    {% endif %} 
+    - {{ user.email }}
+    
 {% endblock title %}
 
 {% block content %}
