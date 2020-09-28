@@ -1,25 +1,62 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Dashboard - Questions
+    Quiz Questions
 {% endblock title %}
 
-
 {% block content %}
-
-{% if questions %}
-<p><a href="{% url 'dash:create-question-choice' questions.first.quiz.pk %}">Create Question for
-        {{ questions.first.quiz.quiz_title }}</a></p>
-
-
-{% for question in questions %}
-<p><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a> |
-    <a href="{{ question.get_delete_url }}">Delete</a>
-    | <a href="{{ question.get_update_url }}">Update</a>
-</p>
-{% endfor %}
-{% else %}
-<h2>You Have not added any question.</h2>
-{% endif %}
+    <div class="row justify-content-center">
+        <p>
+            <a 
+                class="btn btn-outline-primary" 
+                href="{% url 'dash:create-question-choice' questions.first.quiz.pk %}" 
+                role="button"
+            >       
+            Create Question for {{ questions.first.quiz.quiz_title }}
+            </a>
+        </p>
+    </div>
+    <div class="row mt-5 justify-content-center">
+            {% if questions %}
+            <table 
+                class="table table-hover col-10 border-primary"
+                style="background-color: #fff;"
+            >
+                <thead >
+                    <tr>
+                        <th class="col-6 table-bordered">Question</th>
+                    </tr>
+                </thead>
+                {% for question in questions %}                
+                    <tbody>
+                        <tr class="">
+                            <td class="col-6 table-bordered"><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a></td>
+                            <td class="col-2 d-none d-sm-table-cell"><a href="{{ question.get_update_url }}">Update</a></td>
+                            <td class="col-2 d-none d-sm-table-cell"><a href="{{ question.get_delete_url }}">Delete</a></td>
+                        </tr>            
+                    </tbody>
+                {% endfor %}
+            {% else %}
+                <h1 class="text-center display-2">No Questions</h1>
+            {% endif %}            
+            </table>         
+        </div>
+    </div>
 
 {% endblock content %}
+    
+
+        <!-- {% if questions %}
+        <p><a href="{% url 'dash:create-question-choice' questions.first.quiz.pk %}">Create Question for
+                {{ questions.first.quiz.quiz_title }}</a></p>
+
+
+        {% for question in questions %}
+        <p><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a> |
+            <a href="{{ question.get_delete_url }}">Delete</a>
+            | <a href="{{ question.get_update_url }}">Update</a>
+        </p>
+        {% endfor %}
+        {% else %}
+        <h2>You Have not added any question.</h2>
+        {% endif %} -->
