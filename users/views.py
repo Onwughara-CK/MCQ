@@ -26,5 +26,5 @@ class RegisterView(FormView):
             user = form.save(commit=False)
             user.save()
             login(request, user)
-            return redirect(reverse('users:home'))
+            return redirect(reverse('dash:dashboard'))
         return render(request, 'users/register.html', {'form': form})

@@ -1,19 +1,28 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
-Delete
+Delete {{ quiz }}
 {% endblock title %}
 
-{% block page_title %}
-{% endblock page_title %}
-
 {% block content %}
-
-<form method="POST">{% csrf_token %}
-    <p>Are you sure you want to delete "{{ quiz }}"?</p>
-    <p><a href="{{ quiz.get_absolute_url }}">No, Mistake</a></p>
-    <button type="submit">Delete</button>
-</form>
-
+    <div class="row justify-content-center">
+        <form class="form-signin col-10" method="post">
+            {% csrf_token %}
+            <h1 class="h3 mb-3 font-weight-normal">Are you sure you want to delete "{{ quiz }}"?</h1>
+            <div class="form-group d-flex justify-content-center">
+                <a 
+                    href="{{ quiz.get_absolute_url }}"
+                    class="btn mx-1 btn-outline-primary mb-1"
+                >
+                    No, Mistake
+                </a>
+                <button 
+                    class="btn mx-1 btn-danger mb-1" 
+                    type="submit"
+                >
+                    Delete
+                </button>
+            </div>
+        </form>
+    </div>
 {% endblock content %}

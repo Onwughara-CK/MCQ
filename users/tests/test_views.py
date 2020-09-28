@@ -51,7 +51,7 @@ class RegisterViewTest(TestCase):
         user = get_user_model().objects.get(email='jamesbond@test.com')
         self.assertEqual(user.email, 'jamesbond@test.com')
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('users:home'))
+        self.assertRedirects(response, reverse('dash:dashboard'))
 
 
 class LoginViewTest(TestCase):
