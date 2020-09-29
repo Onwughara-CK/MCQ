@@ -59,7 +59,9 @@ class QuizDeleteView(
     model = Quiz
     success_url = reverse_lazy('dash:quiz-list')
     success_message = 'Successfully Deleted quiz'
-    context_object_name = 'quiz'
+    context_object_name = 'object'
+    template_name = "dashboard/dash_confirm_delete.html"
+
 
     def test_func(self):
         user = self.request.user
@@ -116,7 +118,9 @@ class QuestionDeleteView(
 ):
     model = Question
     success_message = 'Successfully Deleted Question'
-    context_object_name = 'question'
+    context_object_name = 'object'
+    template_name = "dashboard/dash_confirm_delete.html"
+
 
     def test_func(self):
         user = self.request.user
