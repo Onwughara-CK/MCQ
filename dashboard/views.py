@@ -56,7 +56,6 @@ class QuizDeleteView(
     context_object_name = 'object'
     template_name = "dashboard/dash_confirm_delete.html"
 
-
     def test_func(self):
         user = self.request.user
         if not user.teacher:
@@ -87,6 +86,7 @@ class QuizUpdateView(
 
 ###### QUESTION ######
 
+
 class QuestionListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
     model = Question
     template_name = "dashboard/question_list.html"
@@ -115,7 +115,6 @@ class QuestionDeleteView(
     context_object_name = 'object'
     template_name = "dashboard/dash_confirm_delete.html"
 
-
     def test_func(self):
         user = self.request.user
         if not user.teacher:
@@ -142,7 +141,6 @@ class QuestionUpdateView(
     success_message = 'Successfully Updated Question'
     template_name = "dashboard/dash_form.html"
 
-
     def test_func(self):
         user = self.request.user
         if not user.teacher:
@@ -156,16 +154,17 @@ class QuizQuestionsListView(
     generic.ListView
 ):
     template_name = "dashboard/quiz_question_list.html"
-    context_object_name = 'questions'
+    context_object_name = 'quiz'
 
     def get_queryset(self):
-        return Quiz.objects.get(pk=self.kwargs['pk']).questions.all()
+        # return Quiz.objects.get(pk=self.kwargs['pk']).questions.all()
+        return Quiz.objects.get(pk=self.kwargs['pk'])
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['quiz_title'] = Quiz.objects.get(
-            pk=self.kwargs['pk']).quiz_title
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['quiz_title'] = Quiz.objects.get(
+    #         pk=self.kwargs['pk']).quiz_title
+    #     return context
 
     def test_func(self):
         user = self.request.user
@@ -184,7 +183,6 @@ class ChoiceUpdateView(
     fields = ('choice_text', 'mark',)
     success_message = 'Successfully Updated Choice'
     template_name = "dashboard/dash_form.html"
-
 
     def get_success_url(self):
         question_pk = Choice.objects.get(
@@ -215,15 +213,20 @@ class CreateQuiz(
         quizForm = QuizForm(request.POST)
 
         if quizForm.is_valid():
-            questionform = quizForm.save(commit=False)
-            questionform.save()
+            quiz = quizForm.save(commit=False)
+            quiz.save()
 
             if request.POST.get('finish'):
-                # return redirect(reverse('dash:quiz-list'))
-                return HttpResponse(status=302)
+                messages.success(
+                    request, 'SuccessFully Created Quiz')
+                return redirect(reverse('dash:quiz-detail', args=[quiz.pk]))
+                # return HttpResponse(status=302)
             if request.POST.get('continue'):
-                return HttpResponse(questionform.pk)
+                # return HttpResponse(quiz.pk)
                 # return redirect(reverse('dash:create-question-answer'), permanent=True)
+                messages.success(
+                    request, 'SuccessFully Created Quiz, Create Question and Choices')
+                return redirect(reverse('dash:create-question-choice', args=[quiz.pk]))
         return render(request, 'dashboard/create_quiz.html', {'form': quizForm})
 
     def test_func(self):
@@ -245,7 +248,7 @@ class CreateQuestionAndChoice(
             'form': QuestionForm(),
             'ChoiceForm': self.ChoiceFormSet(),
         }
-        return render(request, 'dashboard/create_quiz.html',  context)
+        return render(request, 'dashboard/create_quiz.html', context)
 
     def post(self, request, *args, **kwargs):
 
@@ -256,7 +259,7 @@ class CreateQuestionAndChoice(
             'form': questionForm,
             'ChoiceForm': formset,
         }
-        print(questionForm.is_valid(),formset.is_valid())
+
         if questionForm.is_valid() and formset.is_valid():
             questionform = questionForm.save(commit=False)
             quiz = Quiz.objects.get(pk=kwargs['pk'])
@@ -267,11 +270,17 @@ class CreateQuestionAndChoice(
                 instance.question = questionform
                 instance.save()
             if request.POST.get('finish', None):
-                return redirect(reverse('dash:quiz-list'))
-            if request.POST.get('continue', None):
                 messages.success(
                     request, 'SuccessFully Created Question and Choices')
-                return HttpResponse(quiz.pk)
+                return redirect(reverse('dash:quiz-questions', args=[quiz.pk]))
+            if request.POST.get('continue', None):
+                messages.success(
+                    request,
+                    f'SuccessFully Created Question and Choices. Create another for {quiz.quiz_title}'
+                )
+                # return HttpResponse(quiz.pk)
+                # return render(request, 'dashboard/create_quiz.html', self.context)
+                return redirect(reverse('dash:create-question-choice', args=[quiz.pk]))
         return render(request, 'dashboard/create_quiz.html', context)
 
     def test_func(self):
