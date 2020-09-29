@@ -28,7 +28,7 @@ $(function () {
     return data;
   }
 
-  $('#move > #finish').click(function (e) {
+  $('#move > #move1 > #finish').click(function (e) {
     data = tag();
     data['finish'] = true;
     $.ajax({
@@ -45,7 +45,7 @@ $(function () {
     });
   });
 
-  $('#move > #continue').click(function (e) {
+  $('#move > #move1 > #continue').click(function (e) {
     data = tag();
     data['continue'] = true;
     $.ajax({

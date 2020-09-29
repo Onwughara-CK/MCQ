@@ -18,12 +18,6 @@ class DashView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'dashboard/dash.html')
 
-    # def test_func(self):
-    #     user = self.request.user
-    #     if not user.teacher:
-    #         raise PermissionDenied
-    #     return True
-
 
 class QuizListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
     model = Quiz
@@ -221,14 +215,14 @@ class CreateQuiz(
         quizForm = QuizForm(request.POST)
 
         if quizForm.is_valid():
-            qf = quizForm.save(commit=False)
-            qf.save()
+            questionform = quizForm.save(commit=False)
+            questionform.save()
 
             if request.POST.get('finish'):
                 # return redirect(reverse('dash:quiz-list'))
                 return HttpResponse(status=302)
             if request.POST.get('continue'):
-                return HttpResponse(qf.pk)
+                return HttpResponse(questionform.pk)
                 # return redirect(reverse('dash:create-question-answer'), permanent=True)
         return render(request, 'dashboard/create_quiz.html', {'form': quizForm})
 
@@ -247,39 +241,37 @@ class CreateQuestionAndChoice(
     ChoiceFormSet = formset_factory(ChoiceForm, extra=4, max_num=4)
 
     def get(self, request, *args, **kwargs):
-
         context = {
-            'QuestionForm': QuestionForm(),
+            'form': QuestionForm(),
             'ChoiceForm': self.ChoiceFormSet(),
         }
-
         return render(request, 'dashboard/create_quiz.html',  context)
 
     def post(self, request, *args, **kwargs):
 
-        questForm = QuestionForm(request.POST)
+        questionForm = QuestionForm(request.POST)
         formset = self.ChoiceFormSet(request.POST)
 
         context = {
-            'QuestionForm': questForm,
+            'form': questionForm,
             'ChoiceForm': formset,
         }
-
-        if questForm.is_valid() and formset.is_valid():
-            qf = questForm.save(commit=False)
-            qz = Quiz.objects.get(pk=kwargs['pk'])
-            qf.quiz = qz
-            qf.save()
+        print(questionForm.is_valid(),formset.is_valid())
+        if questionForm.is_valid() and formset.is_valid():
+            questionform = questionForm.save(commit=False)
+            quiz = Quiz.objects.get(pk=kwargs['pk'])
+            questionform.quiz = quiz
+            questionform.save()
             for form in formset:
                 instance = form.save(commit=False)
-                instance.question = qf
+                instance.question = questionform
                 instance.save()
             if request.POST.get('finish', None):
                 return redirect(reverse('dash:quiz-list'))
             if request.POST.get('continue', None):
                 messages.success(
                     request, 'SuccessFully Created Question and Choices')
-                return HttpResponse(qz.pk)
+                return HttpResponse(quiz.pk)
         return render(request, 'dashboard/create_quiz.html', context)
 
     def test_func(self):
