@@ -8,6 +8,8 @@ from .forms import RegisterForm
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(reverse('dash:dashboard'))
         return render(request, 'users/index.html')
 
 

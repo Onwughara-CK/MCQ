@@ -81,13 +81,13 @@ class QuizUpdateView(
     model = Quiz
     fields = ('quiz_text', 'duration', 'quiz_title')
     success_message = 'Successfully Updated quiz'
+    template_name = "dashboard/dash_form.html"
 
     def test_func(self):
         user = self.request.user
         if not user.teacher:
             raise PermissionDenied
         return True
-
 
 ###### QUESTION ######
 
@@ -142,6 +142,8 @@ class QuestionUpdateView(
     model = Question
     fields = ('question_text',)
     success_message = 'Successfully Updated Question'
+    template_name = "dashboard/dash_form.html"
+
 
     def test_func(self):
         user = self.request.user
@@ -183,6 +185,8 @@ class ChoiceUpdateView(
     model = Choice
     fields = ('choice_text', 'mark',)
     success_message = 'Successfully Updated Choice'
+    template_name = "dashboard/dash_form.html"
+
 
     def get_success_url(self):
         question_pk = Choice.objects.get(
