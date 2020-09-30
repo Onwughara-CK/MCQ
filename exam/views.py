@@ -1,7 +1,9 @@
+import random
+
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import generic, View
-from django.http import JsonResponse, HttpResponse, Http404
+from django.http import JsonResponse, HttpResponse, Http404, HttpResponseNotFound
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
 
@@ -14,18 +16,24 @@ class ExamListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'exams'
 
 
-class ExamInstructionsView(LoginRequiredMixin, View):
+class ExamInstructionsView(View):
     def get(self, request, *args, **kwargs):
-        exam = get_object_or_404(Quiz, pk=kwargs['pk'])
+        if kwargs.get('sample'):
+            exams = Quiz.objects.all()
+            exam = random.choice(exams)
+            if not exam:
+                HttpResponseNotFound('<h1>No quiz in Database. create at least one quiz to proceed<h1>')
+        else:
+            exam = get_object_or_404(Quiz, pk=kwargs['pk'])
         return render(request, 'exam/exam_instructions.html', {'exam': exam})
 
 
-class ExamQuestionsListView(LoginRequiredMixin, generic.ListView):
+class ExamQuestionsListView(generic.ListView):
     context_object_name = 'questions'
     template_name = 'exam/exam_questions.html'
     paginate_by = 1
 
-    def get_queryset(self):
+    def get_queryset(self):        
         queryset = Quiz.objects.get(
             pk=self.kwargs['pk']).questions.all().order_by('question_text')
         return queryset
@@ -36,7 +44,7 @@ class ExamQuestionsListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class ExamResultView(LoginRequiredMixin, View):
+class ExamResultView(View):
     def get(self, request):
         data = {}
         for k, v in request.session.items():
@@ -107,3 +115,5 @@ class ExamTimerView(View):
         if not request.is_ajax():
             raise Http404
         return HttpResponse(self.timer.get('deadline_in_ms'))
+
+# class SampleExamView()

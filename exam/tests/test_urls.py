@@ -40,3 +40,10 @@ class UrlTest(SimpleTestCase):
         self.assertURLEqual(url, '/exam/timer/')
         self.assertEqual(resolve(url).func.view_class,
                          views.ExamTimerView)
+
+    ### SAMPLE EXAM VIEW ###
+    def test_sample_exam_url_resolves_to_sample_exam_view(self):
+        url = reverse('exam:sample_exam', args=['sample'])
+        self.assertURLEqual(url, '/exam/sample/instructions/')
+        self.assertEqual(resolve(url).func.view_class,
+                         views.ExamInstructionsView)

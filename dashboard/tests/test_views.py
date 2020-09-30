@@ -223,10 +223,10 @@ class QuizDeleteViewTest(TestCase):
     def test_returns_correct_confirm_delete_template(self):
         self.assertEqual(self.response_get.status_code, 200)
         self.assertTemplateUsed(
-            self.response_get, 'dashboard/quiz_confirm_delete.html')
+            self.response_get, 'dashboard/dash_confirm_delete.html')
 
     def test_context_object_name(self):
-        self.assertTrue('quiz' in self.response_get.context)
+        self.assertTrue('object' in self.response_get.context)
 
     def test_success_message(self):
         # no context data as it redirects
@@ -485,10 +485,10 @@ class QuestionDeleteViewTest(TestCase):
     def test_returns_correct_confirm_delete_template(self):
         self.assertEqual(self.response_get.status_code, 200)
         self.assertTemplateUsed(
-            self.response_get, 'dashboard/question_confirm_delete.html')
+            self.response_get, 'dashboard/dash_confirm_delete.html')
 
     def test_context_object_name(self):
-        self.assertTrue('question' in self.response_get.context)
+        self.assertTrue('object' in self.response_get.context)
 
     def test_success_message(self):
         # no context data as it redirects
@@ -628,9 +628,9 @@ class QuizQuestionsListViewTest(TestCase):
             self.response, 'dashboard/quiz_question_list.html')
 
     def test_context_object(self):
-        self.assertTrue('questions' in self.response.context)
+        self.assertTrue('quiz' in self.response.context)
         self.assertCountEqual(
-            self.response.context['questions'], self.quiz.questions.all())
+            self.response.context['quiz'].questions.all(), self.quiz.questions.all())
 
 
 class ChoiceUpdateViewTest(TestCase):
@@ -803,12 +803,10 @@ class CreateQuizViewTest(TestCase):
                 'continue': True,
             }
         )
-        self.assertEqual(response_post.status_code, 200)
+        self.assertEqual(response_post.status_code, 302)
         self.assertEqual(models.Quiz.objects.get(
             quiz_text='quiz text continue').quiz_text, 'quiz text continue')
-        self.assertContains(response_post, models.Quiz.objects.get(
-            quiz_text='quiz text continue').pk)
-
+        
     def test_invalid_data(self):
         response_post = self.client.post(reverse('dash:create-quiz'), data={})
         self.assertEqual(response_post.status_code, 200)
@@ -880,7 +878,7 @@ class CreateQuestionAndChoiceViewTest(TestCase):
 
     # test context for forms
     def test_context_object(self):
-        self.assertTrue('QuestionForm' in self.response_get.context)
+        self.assertTrue('form' in self.response_get.context)
         self.assertTrue('ChoiceForm' in self.response_get.context)
         # check that the no choice forms is 4
         self.assertEqual(len(self.response_get.context['ChoiceForm']), 4)
@@ -927,7 +925,7 @@ class CreateQuestionAndChoiceViewTest(TestCase):
             }
         )
         self.assertEqual(response_post.status_code, 302)
-        self.assertRedirects(response_post, '/dashboard/quizzes/')
+        self.assertRedirects(response_post, f'/dashboard/quiz/{self.quiz.pk}/questions/')
 
     def test_both_forms_valid_and_continue_button_click(self):
         response_post = self.client.post(
@@ -949,11 +947,11 @@ class CreateQuestionAndChoiceViewTest(TestCase):
                 'continue': True,
             }
         )
-        self.assertEqual(response_post.status_code, 200)
+        self.assertEqual(response_post.status_code, 302)
         # test success message
         messages = list(get_messages(response_post.wsgi_request))
         self.assertEqual(
-            str(messages[0]), 'SuccessFully Created Question and Choices')
+            str(messages[0]), 'SuccessFully Created Question and Choices. Create another for title')
 
     def test_both_forms_valid_and_no_finish_or_continue_button_click(self):
         ### create dummy post data ###

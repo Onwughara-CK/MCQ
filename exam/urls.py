@@ -9,6 +9,8 @@ urlpatterns = [
          name='exam-list'),
     path('<int:pk>/instructions/', views.ExamInstructionsView.as_view(),
          name='exam-instruction'),
+    path('<str:sample>/instructions/', views.ExamInstructionsView.as_view(),
+         name='sample_exam'),
     path('<int:pk>/', views.ExamQuestionsListView.as_view(),
          name='exam-questions-list'),
     path('result/', views.ExamResultView.as_view(),

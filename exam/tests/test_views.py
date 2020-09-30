@@ -75,15 +75,7 @@ class ExamInstructionsViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('exam:exam-instruction', args=[self.quiz.pk]))
-
-    def test_redirect_if_not_logged_in(self):
-        self.client.logout()
-        response = self.client.get(
-            reverse('exam:exam-instruction', args=[self.quiz.pk]))
-        self.assertRedirects(
-            response, f'/login/?next=/exam/{self.quiz.pk}/instructions/')
-        self.assertEqual(response.status_code, 302)
+            reverse('exam:exam-instruction', args=[self.quiz.pk]))    
 
     def test_logged_in_with_correct_permission(self):
         self.assertEqual(self.response.status_code, 200)
@@ -120,13 +112,6 @@ class ExamQuestionsListViewTest(TestCase):
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
             reverse('exam:exam-questions-list', args=[self.quiz.pk]))
-
-    def test_redirect_if_not_logged_in(self):
-        self.client.logout()
-        response = self.client.get(
-            reverse('exam:exam-questions-list', args=[self.quiz.pk]))
-        self.assertRedirects(response, f'/login/?next=/exam/{self.quiz.pk}/')
-        self.assertEqual(response.status_code, 302)
 
     def test_logged_in(self):
         self.assertEqual(self.response.status_code, 200)
@@ -186,11 +171,14 @@ class ExamResultViewTest(TestCase):
         self.response = self.client.get(reverse('exam:exam-result'))
 
     # test not login
-    def test_redirect_if_not_logged_in(self):
+    def test_guest_not_ajax(self):
         self.client.logout()
-        response = self.client.get(reverse('exam:exam-result'))
-        self.assertRedirects(response, f'/login/?next=/exam/result/')
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse('exam:exam-result'))        
+        self.assertEqual(response.status_code, 404)
+        # post
+        response = self.client.post(reverse('exam:exam-result'))
+        self.assertEqual(response.status_code, 204)
+
 
     def test_logged_in_but_not_ajax(self):
         self.assertEqual(self.response.status_code, 404)

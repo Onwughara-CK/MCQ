@@ -30,9 +30,8 @@ class QuizListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
             raise PermissionDenied
         return True
 
+
 ##### quiz #####
-
-
 class QuizDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
     model = Quiz
     template_name = "dashboard/quiz_detail.html"
@@ -84,9 +83,8 @@ class QuizUpdateView(
             raise PermissionDenied
         return True
 
+
 ###### QUESTION ######
-
-
 class QuestionListView(LoginRequiredMixin, UserPassesTestMixin, generic.ListView):
     model = Question
     template_name = "dashboard/question_list.html"

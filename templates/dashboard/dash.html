@@ -38,8 +38,8 @@
             <!-- if user is not teacher -->
             <div class="row mt-5 justify-content-center">
                 <div class="col-10 col-md-8 d-flex justify-content-center flex-sm-row flex-column">
-                    <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="#" >Sample Quiz</a>
-                    <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="#" >Select Quiz To Practise</a>
+                    <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="{%  url 'exam:sample_exam' 'sample' %}" >Sample Quiz</a>
+                    <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="{% url 'exam:exam-list' %}" >Select Quiz To Practise</a>
                     <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="#" >Results</a>
                 </div>
             </div>
