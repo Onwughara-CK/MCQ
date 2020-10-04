@@ -8,11 +8,11 @@
 {% block content %}
 <div class="row justify-content-center">
     <p class="d-flex justify-content-center">
-        <a class="btn btn-outline-primary mr-1" href="{% url 'dash:quiz-questions' quiz.pk %}">
+        <a class="btn btn-outline-primary mr-1" href="{% url 'dash:quiz_questions' quiz.pk %}">
             See all Questions for this Quiz
         </a>
 
-        <a class="btn btn-outline-primary" href="{% url 'dash:create-question-choice' quiz.pk %}">
+        <a class="btn btn-outline-primary" href="{% url 'dash:create_question_choice' quiz.pk %}">
             Create Question for this Quiz
         </a>
     </p>

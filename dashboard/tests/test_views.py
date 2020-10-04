@@ -131,12 +131,12 @@ class QuizDetailViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('dash:quiz-detail', args=[self.quiz.pk]))
+            reverse('dash:quiz_detail', args=[self.quiz.pk]))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response = self.client.get(
-            reverse('dash:quiz-detail', args=[self.quiz.pk]))
+            reverse('dash:quiz_detail', args=[self.quiz.pk]))
         self.assertRedirects(response, '/login/?next=/dashboard/quiz/1/')
         self.assertEqual(response.status_code, 302)
 
@@ -147,7 +147,7 @@ class QuizDetailViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response = self.client.get(
-            reverse('dash:quiz-detail', args=[self.quiz.pk]))
+            reverse('dash:quiz_detail', args=[self.quiz.pk]))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
@@ -186,16 +186,16 @@ class QuizDeleteViewTest(TestCase):
             email='teacher@test.com', password='asdf7890')
 
         self.response_get = self.client.get(
-            reverse('dash:quiz-delete', args=[self.quiz.pk]))
+            reverse('dash:quiz_delete', args=[self.quiz.pk]))
 
         self.response_delete = self.client.delete(
-            reverse('dash:quiz-delete', args=[self.quiz.pk]))
+            reverse('dash:quiz_delete', args=[self.quiz.pk]))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response_get = self.client.get(reverse('dash:quiz-delete', args=[1]))
+        response_get = self.client.get(reverse('dash:quiz_delete', args=[1]))
         response_delete = self.client.delete(
-            reverse('dash:quiz-delete', args=[1]))
+            reverse('dash:quiz_delete', args=[1]))
         self.assertRedirects(
             response_get, '/login/?next=/dashboard/quiz/1/delete/')
         self.assertRedirects(
@@ -206,9 +206,9 @@ class QuizDeleteViewTest(TestCase):
     def test_logged_in_but_not_correct_permission(self):
         self.client.login(
             email='student@test.com', password='asdf7890')
-        response_get = self.client.get(reverse('dash:quiz-delete', args=[1]))
+        response_get = self.client.get(reverse('dash:quiz_delete', args=[1]))
         response_delete = self.client.delete(
-            reverse('dash:quiz-delete', args=[1]))
+            reverse('dash:quiz_delete', args=[1]))
         self.assertEqual(response_delete.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -258,9 +258,9 @@ class QuizUpdateViewTest(TestCase):
         self.quiz = models.Quiz.objects.create(
             quiz_text='text', quiz_title='title')
         self.response_get = self.client.get(
-            reverse('dash:quiz-update', args=[self.quiz.pk]))
+            reverse('dash:quiz_update', args=[self.quiz.pk]))
         self.response_put = self.client.post(
-            path=reverse('dash:quiz-update', args=[self.quiz.pk]),
+            path=reverse('dash:quiz_update', args=[self.quiz.pk]),
             data={
                 'quiz_text': 'text updated',
                 'duration':    timedelta(minutes=30),
@@ -270,9 +270,9 @@ class QuizUpdateViewTest(TestCase):
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response_get = self.client.get(reverse('dash:quiz-update', args=[1]))
+        response_get = self.client.get(reverse('dash:quiz_update', args=[1]))
         response_put = self.client.put(
-            reverse('dash:quiz-update', args=[1]))
+            reverse('dash:quiz_update', args=[1]))
         self.assertRedirects(
             response_get, '/login/?next=/dashboard/quiz/1/update/')
         self.assertRedirects(
@@ -283,9 +283,9 @@ class QuizUpdateViewTest(TestCase):
     def test_logged_in_but_not_correct_permission(self):
         self.client.login(
             email='student@test.com', password='asdf7890')
-        response_get = self.client.get(reverse('dash:quiz-update', args=[1]))
+        response_get = self.client.get(reverse('dash:quiz_update', args=[1]))
         response_put = self.client.put(
-            reverse('dash:quiz-update', args=[1]))
+            reverse('dash:quiz_update', args=[1]))
         self.assertEqual(response_put.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -306,7 +306,7 @@ class QuizUpdateViewTest(TestCase):
 
     def test_invalid_data(self):
         response_put = self.client.post(
-            path=reverse('dash:quiz-update', args=[self.quiz.pk]),
+            path=reverse('dash:quiz_update', args=[self.quiz.pk]),
             data={}
         )
         # meant to redirect with status code 302 not 200
@@ -340,11 +340,11 @@ class QuestionListViewTest(TestCase):
     def setUp(self):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
-        self.response = self.client.get(reverse('dash:question-list'))
+        self.response = self.client.get(reverse('dash:question_list'))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response = self.client.get(reverse('dash:question-list'))
+        response = self.client.get(reverse('dash:question_list'))
         self.assertRedirects(response, '/login/?next=/dashboard/questions/')
         self.assertEqual(response.status_code, 302)
 
@@ -354,7 +354,7 @@ class QuestionListViewTest(TestCase):
     def test_logged_in_but_not_correct_permission(self):
         self.client.login(
             email='student@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:question-list'))
+        response = self.client.get(reverse('dash:question_list'))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
@@ -396,11 +396,11 @@ class QuestionDetailViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('dash:question-detail', args=[self.question.pk]))
+            reverse('dash:question_detail', args=[self.question.pk]))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response = self.client.get(reverse('dash:question-detail', args=[1]))
+        response = self.client.get(reverse('dash:question_detail', args=[1]))
         self.assertRedirects(response, '/login/?next=/dashboard/question/1/')
         self.assertEqual(response.status_code, 302)
 
@@ -446,17 +446,17 @@ class QuestionDeleteViewTest(TestCase):
             email='teacher@test.com', password='asdf7890')
 
         self.response_get = self.client.get(
-            reverse('dash:question-delete', args=[self.question.pk]))
+            reverse('dash:question_delete', args=[self.question.pk]))
 
         self.response_delete = self.client.delete(
-            reverse('dash:question-delete', args=[self.question.pk]))
+            reverse('dash:question_delete', args=[self.question.pk]))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response_get = self.client.get(
-            reverse('dash:question-delete', args=[1]))
+            reverse('dash:question_delete', args=[1]))
         response_delete = self.client.delete(
-            reverse('dash:question-delete', args=[1]))
+            reverse('dash:question_delete', args=[1]))
         self.assertRedirects(
             response_get, '/login/?next=/dashboard/question/1/delete/')
         self.assertRedirects(
@@ -468,9 +468,9 @@ class QuestionDeleteViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
-            reverse('dash:question-delete', args=[1]))
+            reverse('dash:question_delete', args=[1]))
         response_delete = self.client.delete(
-            reverse('dash:question-delete', args=[1]))
+            reverse('dash:question_delete', args=[1]))
         self.assertEqual(response_delete.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -522,9 +522,9 @@ class QuestionUpdateViewTest(TestCase):
         self.question = models.Question.objects.create(
             question_text='text', quiz=self.quiz)
         self.response_get = self.client.get(
-            reverse('dash:question-update', args=[self.question.pk]))
+            reverse('dash:question_update', args=[self.question.pk]))
         self.response_put = self.client.post(
-            path=reverse('dash:question-update', args=[self.question.pk]),
+            path=reverse('dash:question_update', args=[self.question.pk]),
             data={
                 'question_text': 'text updated',
             }
@@ -533,9 +533,9 @@ class QuestionUpdateViewTest(TestCase):
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response_get = self.client.get(
-            reverse('dash:question-update', args=[1]))
+            reverse('dash:question_update', args=[1]))
         response_put = self.client.put(
-            reverse('dash:question-update', args=[1]))
+            reverse('dash:question_update', args=[1]))
         self.assertRedirects(
             response_get, '/login/?next=/dashboard/question/1/update/')
         self.assertRedirects(
@@ -547,9 +547,9 @@ class QuestionUpdateViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
-            reverse('dash:question-update', args=[1]))
+            reverse('dash:question_update', args=[1]))
         response_put = self.client.put(
-            reverse('dash:question-update', args=[1]))
+            reverse('dash:question_update', args=[1]))
         self.assertEqual(response_put.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -566,7 +566,7 @@ class QuestionUpdateViewTest(TestCase):
 
     def test_invalid_data(self):
         response_post = self.client.post(
-            path=reverse('dash:question-update', args=[self.question.pk]),
+            path=reverse('dash:question_update', args=[self.question.pk]),
             data={}
         )
         # should redirect with status code 302 not 200
@@ -602,12 +602,12 @@ class QuizQuestionsListViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+            reverse('dash:quiz_questions', args=[self.quiz.pk]))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response = self.client.get(
-            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+            reverse('dash:quiz_questions', args=[self.quiz.pk]))
         self.assertRedirects(
             response, '/login/?next=/dashboard/quiz/1/questions/')
         self.assertEqual(response.status_code, 302)
@@ -619,7 +619,7 @@ class QuizQuestionsListViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response = self.client.get(
-            reverse('dash:quiz-questions', args=[self.quiz.pk]))
+            reverse('dash:quiz_questions', args=[self.quiz.pk]))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
@@ -661,9 +661,9 @@ class ChoiceUpdateViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response_get = self.client.get(
-            reverse('dash:choice-update', args=[self.choice.pk]))
+            reverse('dash:choice_update', args=[self.choice.pk]))
         self.response_put = self.client.post(
-            reverse('dash:choice-update', args=[self.choice.pk]),
+            reverse('dash:choice_update', args=[self.choice.pk]),
             {
                 'mark': 'wrong',
                 'choice_text': 'text updated',
@@ -673,9 +673,9 @@ class ChoiceUpdateViewTest(TestCase):
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response_get = self.client.get(
-            reverse('dash:choice-update', args=[1]))
+            reverse('dash:choice_update', args=[1]))
         response_put = self.client.put(
-            reverse('dash:choice-update', args=[1]))
+            reverse('dash:choice_update', args=[1]))
         self.assertRedirects(
             response_get, '/login/?next=/dashboard/choice/1/update/')
         self.assertRedirects(
@@ -687,9 +687,9 @@ class ChoiceUpdateViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
-            reverse('dash:choice-update', args=[1]))
+            reverse('dash:choice_update', args=[1]))
         response_put = self.client.put(
-            reverse('dash:choice-update', args=[1]))
+            reverse('dash:choice_update', args=[1]))
         self.assertEqual(response_put.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -708,7 +708,7 @@ class ChoiceUpdateViewTest(TestCase):
 
     def test_invalid_data(self):
         response_post = self.client.post(
-            path=reverse('dash:choice-update', args=[self.choice.pk]),
+            path=reverse('dash:choice_update', args=[self.choice.pk]),
             data={}
         )
         self.assertEqual(response_post.status_code, 200)
@@ -736,18 +736,18 @@ class CreateQuizViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response_get = self.client.get(
-            reverse('dash:create-quiz'))
+            reverse('dash:create_quiz'))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response_get = self.client.get(
-            reverse('dash:create-quiz'))
+            reverse('dash:create_quiz'))
         response_post = self.client.post(
-            reverse('dash:create-quiz'))
+            reverse('dash:create_quiz'))
         self.assertRedirects(
-            response_get, '/login/?next=/dashboard/create-quiz/')
+            response_get, '/login/?next=/dashboard/create_quiz/')
         self.assertRedirects(
-            response_post, '/login/?next=/dashboard/create-quiz/')
+            response_post, '/login/?next=/dashboard/create_quiz/')
         self.assertEqual(response_get.status_code, 302)
         self.assertEqual(response_post.status_code, 302)
 
@@ -755,9 +755,9 @@ class CreateQuizViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
-            reverse('dash:create-quiz'))
+            reverse('dash:create_quiz'))
         response_post = self.client.post(
-            reverse('dash:create-quiz'))
+            reverse('dash:create_quiz'))
         self.assertEqual(response_post.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -768,7 +768,7 @@ class CreateQuizViewTest(TestCase):
 
         ### test request.POST['finish'] ###
         response_post = self.client.post(
-            path=reverse('dash:create-quiz'),
+            path=reverse('dash:create_quiz'),
             data={
                 'quiz_text': 'quiz text finish',
                 'quiz_title': 'quiz title',
@@ -783,7 +783,7 @@ class CreateQuizViewTest(TestCase):
 
         ### test request.POST['finish'] is None ###
         response_post = self.client.post(
-            path=reverse('dash:create-quiz'),
+            path=reverse('dash:create_quiz'),
             data={
                 'quiz_text': 'quiz text',
                 'quiz_title': 'quiz title',
@@ -795,7 +795,7 @@ class CreateQuizViewTest(TestCase):
 
         ### test request.POST['continue'] ###
         response_post = self.client.post(
-            path=reverse('dash:create-quiz'),
+            path=reverse('dash:create_quiz'),
             data={
                 'quiz_text': 'quiz text continue',
                 'quiz_title': 'quiz title',
@@ -808,7 +808,7 @@ class CreateQuizViewTest(TestCase):
             quiz_text='quiz text continue').quiz_text, 'quiz text continue')
         
     def test_invalid_data(self):
-        response_post = self.client.post(reverse('dash:create-quiz'), data={})
+        response_post = self.client.post(reverse('dash:create_quiz'), data={})
         self.assertEqual(response_post.status_code, 200)
         self.assertEqual(models.Quiz.objects.count(), 0)
 
@@ -843,19 +843,19 @@ class CreateQuestionAndChoiceViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response_get = self.client.get(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+            reverse('dash:create_question_choice', args=[self.quiz.pk]))
 
     # test if not login
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
         response_get = self.client.get(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+            reverse('dash:create_question_choice', args=[self.quiz.pk]))
         response_post = self.client.post(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+            reverse('dash:create_question_choice', args=[self.quiz.pk]))
         self.assertRedirects(
-            response_get, f'/login/?next=/dashboard/quiz/{self.quiz.pk}/create-question-choice/')
+            response_get, f'/login/?next=/dashboard/quiz/{self.quiz.pk}/create_question_choice/')
         self.assertRedirects(
-            response_post, f'/login/?next=/dashboard/quiz/{self.quiz.pk}/create-question-choice/')
+            response_post, f'/login/?next=/dashboard/quiz/{self.quiz.pk}/create_question_choice/')
         self.assertEqual(response_get.status_code, 302)
         self.assertEqual(response_post.status_code, 302)
 
@@ -870,9 +870,9 @@ class CreateQuestionAndChoiceViewTest(TestCase):
         self.client.login(
             email='student@test.com', password='asdf7890')
         response_get = self.client.get(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+            reverse('dash:create_question_choice', args=[self.quiz.pk]))
         response_post = self.client.post(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]))
+            reverse('dash:create_question_choice', args=[self.quiz.pk]))
         self.assertEqual(response_post.status_code, 403)
         self.assertEqual(response_get.status_code, 403)
 
@@ -889,7 +889,7 @@ class CreateQuestionAndChoiceViewTest(TestCase):
         Only question form is valid, so the form is re-rendered
         """
         response_post = self.client.post(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            reverse('dash:create_question_choice', args=[self.quiz.pk]),
             {
                 'question_text': 'question text',
                 'form-TOTAL_FORMS': 4,
@@ -906,7 +906,7 @@ class CreateQuestionAndChoiceViewTest(TestCase):
     def test_both_forms_valid_and_finish_button_click(self):
         ### create dummy post data ###
         response_post = self.client.post(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            reverse('dash:create_question_choice', args=[self.quiz.pk]),
             {
                 'form-0-choice_text': 'choice0',
                 'form-1-choice_text': 'choice1',
@@ -929,7 +929,7 @@ class CreateQuestionAndChoiceViewTest(TestCase):
 
     def test_both_forms_valid_and_continue_button_click(self):
         response_post = self.client.post(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            reverse('dash:create_question_choice', args=[self.quiz.pk]),
             {
                 'form-0-choice_text': 'choice0',
                 'form-1-choice_text': 'choice1',
@@ -956,7 +956,7 @@ class CreateQuestionAndChoiceViewTest(TestCase):
     def test_both_forms_valid_and_no_finish_or_continue_button_click(self):
         ### create dummy post data ###
         response_post = self.client.post(
-            reverse('dash:create-question-choice', args=[self.quiz.pk]),
+            reverse('dash:create_question_choice', args=[self.quiz.pk]),
             {
                 'form-0-choice_text': 'choice0',
                 'form-1-choice_text': 'choice1',

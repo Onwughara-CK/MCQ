@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="row justify-content-center">
-        <p><a class="btn btn-outline-primary" href="{% url 'dash:create-quiz' %}" role="button">Create Quiz</a></p>
+        <p><a class="btn btn-outline-primary" href="{% url 'dash:create_quiz' %}" role="button">Create Quiz</a></p>
     </div>
         <div class="row justify-content-center">
             {% if quizzes %}    
@@ -24,7 +24,7 @@
                         <tbody>
                             <tr class="">
                                 <td class="col-6 table-bordered"><a href="{{ quiz.get_absolute_url }}">{{ quiz.quiz_title }}</a></td>
-                                <td class="col-2 table-bordered"><a href="{% url 'dash:quiz-questions' quiz.pk %}">({{ quiz.questions.count }})</a></td>
+                                <td class="col-2 table-bordered"><a href="{% url 'dash:quiz_questions' quiz.pk %}">({{ quiz.questions.count }})</a></td>
                                 <td class="col-2 d-none d-sm-table-cell"><a href="{{ quiz.get_update_url }}">Update</a></td>
                                 <td class="col-2 d-none d-sm-table-cell"><a href="{{ quiz.get_delete_url }}">Delete</a></td>
                             </tr>            
@@ -36,16 +36,3 @@
             {% endif %}
         </div>    
 {% endblock content %}
-<!-- <p><a href="{% url 'dash:create-quiz' %}">Create Quiz</a></p>
-
-{% if quizzes %}
-
-{% for quiz in quizzes %}
-<p><a href="{{ quiz.get_absolute_url }}">{{ quiz.quiz_title }}</a> | <a href="{{ quiz.get_delete_url }}">Delete</a>
-    | <a href="{{ quiz.get_update_url }}">Update</a> | <a
-        href="{% url 'dash:quiz-questions' quiz.pk %}">({{ quiz.questions.count }}
-        question{{ quiz.questions.count|pluralize }})</a>
-</p>
-{% endfor %}
-
-{% endif %} -->

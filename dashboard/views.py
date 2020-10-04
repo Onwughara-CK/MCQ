@@ -122,7 +122,7 @@ class QuestionDeleteView(
         return True
 
     def get_success_url(self):
-        return reverse('dash:quiz-questions', args=[self.object.quiz.pk])
+        return reverse('dash:quiz_questions', args=[self.object.quiz.pk])
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -187,7 +187,7 @@ class ChoiceUpdateView(
     def get_success_url(self):
         question_pk = Choice.objects.get(
             pk=self.kwargs['pk']).question.pk
-        return reverse('dash:question-detail', args=[question_pk])
+        return reverse('dash:question_detail', args=[question_pk])
 
     def test_func(self):
         user = self.request.user
@@ -219,14 +219,14 @@ class CreateQuiz(
             if request.POST.get('finish'):
                 messages.success(
                     request, 'SuccessFully Created Quiz')
-                return redirect(reverse('dash:quiz-detail', args=[quiz.pk]))
+                return redirect(reverse('dash:quiz_detail', args=[quiz.pk]))
                 # return HttpResponse(status=302)
             if request.POST.get('continue'):
                 # return HttpResponse(quiz.pk)
-                # return redirect(reverse('dash:create-question-answer'), permanent=True)
+                # return redirect(reverse('dash:create_question_answer'), permanent=True)
                 messages.success(
                     request, 'SuccessFully Created Quiz, Create Question and Choices')
-                return redirect(reverse('dash:create-question-choice', args=[quiz.pk]))
+                return redirect(reverse('dash:create_question_choice', args=[quiz.pk]))
         return render(request, 'dashboard/create_quiz.html', {'form': quizForm})
 
     def test_func(self):
@@ -272,7 +272,7 @@ class CreateQuestionAndChoice(
             if request.POST.get('finish', None):
                 messages.success(
                     request, 'SuccessFully Created Question and Choices')
-                return redirect(reverse('dash:quiz-questions', args=[quiz.pk]))
+                return redirect(reverse('dash:quiz_questions', args=[quiz.pk]))
             if request.POST.get('continue', None):
                 messages.success(
                     request,
@@ -280,7 +280,7 @@ class CreateQuestionAndChoice(
                 )
                 # return HttpResponse(quiz.pk)
                 # return render(request, 'dashboard/create_quiz.html', self.context)
-                return redirect(reverse('dash:create-question-choice', args=[quiz.pk]))
+                return redirect(reverse('dash:create_question_choice', args=[quiz.pk]))
         return render(request, 'dashboard/create_quiz.html', context)
 
     def test_func(self):

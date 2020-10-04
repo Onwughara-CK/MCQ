@@ -6,15 +6,15 @@ app_name = 'exam'
 
 urlpatterns = [
     path('', views.ExamListView.as_view(),
-         name='exam-list'),
+         name='exam_list'),
     path('<int:pk>/instructions/', views.ExamInstructionsView.as_view(),
-         name='exam-instruction'),
+         name='exam_instruction'),
     path('<str:sample>/instructions/', views.ExamInstructionsView.as_view(),
          name='sample_exam'),
     path('<int:pk>/', views.ExamQuestionsListView.as_view(),
-         name='exam-questions-list'),
+         name='exam_questions_list'),
     path('result/', views.ExamResultView.as_view(),
-         name='exam-result'),
+         name='exam_result'),
     path('timer/', views.ExamTimerView.as_view(),
          name='timer'),
 ]

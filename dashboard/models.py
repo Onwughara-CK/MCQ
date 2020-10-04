@@ -11,13 +11,13 @@ class Quiz(models.Model):
     duration = models.DurationField(default=timedelta(minutes=5), help_text='HH:MM:SS')
 
     def get_absolute_url(self):
-        return reverse('dash:quiz-detail', args=[self.pk, ])
+        return reverse('dash:quiz_detail', args=[self.pk, ])
 
     def get_delete_url(self):
-        return reverse('dash:quiz-delete', args=[self.pk, ])
+        return reverse('dash:quiz_delete', args=[self.pk, ])
 
     def get_update_url(self):
-        return reverse('dash:quiz-update', args=[self.pk, ])
+        return reverse('dash:quiz_update', args=[self.pk, ])
 
     def __str__(self):
         return self.quiz_title
@@ -29,13 +29,13 @@ class Question(models.Model):
         Quiz, on_delete=models.CASCADE, related_name='questions')
 
     def get_absolute_url(self):
-        return reverse('dash:question-detail', args=[self.pk, ])
+        return reverse('dash:question_detail', args=[self.pk, ])
 
     def get_delete_url(self):
-        return reverse('dash:question-delete', args=[self.pk, ])
+        return reverse('dash:question_delete', args=[self.pk, ])
 
     def get_update_url(self):
-        return reverse('dash:question-update', args=[self.pk, ])
+        return reverse('dash:question_update', args=[self.pk, ])
 
     def __str__(self):
         return self.question_text
@@ -59,7 +59,7 @@ class Choice(models.Model):
     )    
 
     def get_update_url(self):
-        return reverse('dash:choice-update', args=[self.pk, ])
+        return reverse('dash:choice_update', args=[self.pk, ])
 
     def __str__(self):
         return self.choice_text

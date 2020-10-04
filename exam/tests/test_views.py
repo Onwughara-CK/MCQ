@@ -30,11 +30,11 @@ class ExamListViewTest(TestCase):
     def setUp(self):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
-        self.response = self.client.get(reverse('exam:exam-list'))
+        self.response = self.client.get(reverse('exam:exam_list'))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response = self.client.get(reverse('exam:exam-list'))
+        response = self.client.get(reverse('exam:exam_list'))
         self.assertRedirects(response, '/login/?next=/exam/')
         self.assertEqual(response.status_code, 302)
 
@@ -75,7 +75,7 @@ class ExamInstructionsViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('exam:exam-instruction', args=[self.quiz.pk]))    
+            reverse('exam:exam_instruction', args=[self.quiz.pk]))    
 
     def test_logged_in_with_correct_permission(self):
         self.assertEqual(self.response.status_code, 200)
@@ -111,7 +111,7 @@ class ExamQuestionsListViewTest(TestCase):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('exam:exam-questions-list', args=[self.quiz.pk]))
+            reverse('exam:exam_questions_list', args=[self.quiz.pk]))
 
     def test_logged_in(self):
         self.assertEqual(self.response.status_code, 200)
@@ -168,27 +168,27 @@ class ExamResultViewTest(TestCase):
     def setUp(self):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
-        self.response = self.client.get(reverse('exam:exam-result'))
+        self.response = self.client.get(reverse('exam:exam_result'))
 
     # test not login
     def test_guest_not_ajax(self):
         self.client.logout()
-        response = self.client.get(reverse('exam:exam-result'))        
+        response = self.client.get(reverse('exam:exam_result'))        
         self.assertEqual(response.status_code, 404)
         # post
-        response = self.client.post(reverse('exam:exam-result'))
+        response = self.client.post(reverse('exam:exam_result'))
         self.assertEqual(response.status_code, 204)
 
 
     def test_not_ajax(self):
         self.assertEqual(self.response.status_code, 404)
         # post
-        response = self.client.post(reverse('exam:exam-result'))
+        response = self.client.post(reverse('exam:exam_result'))
         self.assertEqual(response.status_code, 204)
 
     def test_ajax_get(self):
         response = self.client.get(
-            reverse('exam:exam-result'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+            reverse('exam:exam_result'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         # receive json bytes, so decode byte to json and check
         self.assertJSONEqual(response.content.decode(), {})
@@ -196,7 +196,7 @@ class ExamResultViewTest(TestCase):
     # test post as ajax without finish
     def test_ajax_post_not_finish(self):
         response = self.client.post(
-            reverse('exam:exam-result'),
+            reverse('exam:exam_result'),
             data={},
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
@@ -204,7 +204,7 @@ class ExamResultViewTest(TestCase):
 
     def test_ajax_post_and_finish(self):
         response = self.client.post(
-            reverse('exam:exam-result'),
+            reverse('exam:exam_result'),
             data={
                 'finish': True,
                 'quiz_pk': self.quiz.pk,
@@ -215,7 +215,7 @@ class ExamResultViewTest(TestCase):
 
     def test_logged_in_without_ajax_post_but_finish(self):
         response = self.client.post(
-            reverse('exam:exam-result'),
+            reverse('exam:exam_result'),
             data={
                 'finish': True,
                 'quiz_pk': self.quiz.pk,
@@ -230,7 +230,7 @@ class ExamResultViewTest(TestCase):
 
     def test_logged_in_without_ajax_post_and_finish_with_correct_choices(self):
         response = self.client.post(
-            reverse('exam:exam-result'),
+            reverse('exam:exam_result'),
             data={
                 'finish': True,
                 'quiz_pk': self.quiz.pk,

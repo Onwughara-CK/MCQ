@@ -33,7 +33,7 @@
 </div>
 <div class="row mt-5 justify-content-center">
     <div class="col-10">
-        <a class="btn mx-1 btn-success mb-1 flex-fill" id="start" href="{% url 'exam:exam-questions-list' exam.pk %}">Start Quiz</a>
+        <a class="btn mx-1 btn-success mb-1 flex-fill" id="start" href="{% url 'exam:exam_questions_list' exam.pk %}">Start Quiz</a>
         <input type="hidden" name="pk" value="{{ exam.pk }}">
         {% csrf_token %}
     </div>
