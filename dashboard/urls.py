@@ -10,7 +10,7 @@ urlpatterns = [
     path('', views.DashView.as_view(), name='dashboard'),
 
     ### quiz url ###
-    path('quizzes/', views.QuizListView.as_view(), name='quiz-list'),
+    path('quizzes/', views.QuizListView.as_view(), name='quiz_list'),
     path('quiz/<int:pk>/', views.QuizDetailView.as_view(), name='quiz-detail'),
     path('quiz/<int:pk>/delete/',
          views.QuizDeleteView.as_view(), name='quiz-delete'),

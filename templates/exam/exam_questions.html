@@ -2,12 +2,18 @@
 {% load static %}
 
 {% block title %}
-Exam
+    Exam
 {% endblock title %}
 
+#links == small boxes of questions indicating answered and not answered
+
+
+{% block navbar %}    
+{% endblock navbar %}   
+
 {% block content %}
-<div class="row my-3 justify-content-center">
-    <span class="badge badge-primary my-2 px-3"><h2 id="timer">00:00:00</h2></span>    
+<span class="badge badge-primary py-0 fixed-top"><h2 id="timer">00:00:00</h2></span>
+<div class="row my-3 justify-content-center">    
     <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
     {% if questions %}
         {% for question in questions %}
@@ -26,15 +32,13 @@ Exam
                             <ul class="list-group list-group-flush">
                             {% for choice in question.choices.all %}
                                 <li class="list-group-item">
-                                    <input 
-                                        type="radio" 
-                                        name="choice" 
-                                        id="Question{{ page_obj.number }}" 
-                                        value="{{ choice.pk }}"> 
-                                    <label
-                                        for="Question{{ page_obj.number }}"
-                                    >
-                                        {{ choice }}
+                                    <label>
+                                        <input 
+                                            type="radio" 
+                                            name="choice" 
+                                            id="Question{{ page_obj.number }}" 
+                                            value="{{ choice.pk }}"> 
+                                            {{ choice }}
                                     </label>
                                 </li>
                             {% endfor %}                        
@@ -53,34 +57,62 @@ Exam
         <ul class="pagination flex-column flex-sm-row pagination-lg justify-content-around align-items-center align-items-sm-baseline">
             <!-- prev button -->
             <li class="page-item {% if not page_obj.has_previous %}disable{% endif %}">
-                <a class="page-link" 
+                <a 
                     {% if page_obj.has_previous %} 
+                        class="page-link" 
                         href="?page={{ page_obj.previous_page_number }}"
                         style="background-color: dodgerblue; color: #fff;"
                     {% else %}
-                        style="background-color: rgb(52, 85, 107); color: #fff;"
+                        style="background-color: rgb(52, 85, 107); cursor:not-allowed;"
+                        class="text-secondary page-link"
                     {% endif %} 
                     aria-label="Previous"
                 >
-                    <span aria-hidden="true"> &lt;&lt; </span>
+                    <span aria-hidden="true">&lt;&lt;Prev</span>
                 </a>
             </li>
+            <!-- finish and abort -->
+            <div class='d-flex my-1 flex-sm-row flex-column justify-content-center'>
             <!-- finish button -->
-            <li class="page-item mx-1">
-                <form action="/exam/result/" method="post">
-                    {% csrf_token %}
-                    <input class="btn mx-1 btn-success mb-1 flex-fill" id='finish' style="padding: .75rem 1.5rem;"
-                        type="submit" value="Finish" name="finish">
-                    <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
-                </form>
-            </li>
+                <li class="page-item mx-1">
+                    <form action="/exam/result/" method="post">
+                        {% csrf_token %}
+                        <input class="btn mx-1 btn-success mb-1 flex-fill" id='finish' style="padding: .75rem 1.5rem;"
+                            type="submit" value="Finish" name="finish">
+                        <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
+                        <input type="hidden" name="elapse" value="">
+                    </form>
+                </li>
+                <!-- abort button -->
+                <li class="page-item mx-1">
+                    <a 
+                        class="btn mx-1 btn-danger mb-1 flex-fill" style="padding: .75rem 1.5rem;" 
+                        href="{% url 'exam:exam-list' %}"
+                    >
+                        Abort
+                    </a>               
+                </li>
+            </div>
+
             <!-- next button -->
-            <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
-                <a class="page-link" {% if page_obj.has_next %} href="?page={{ page_obj.next_page_number }}" {% endif %}
+            <li 
+                class="page-item {% if not page_obj.has_next %} disabled {% endif %}"
+                {% if not page_obj.has_next %}
+                    style="cursor:not-allowed;"
+                {% endif %}
+            >
+                <a  
+                    {% if page_obj.has_next %} 
+                        class="page-link"
+                        style="background-color: dodgerblue; color: #fff;"    
+                        href="?page={{ page_obj.next_page_number }}" 
+                    {% else %}
+                        class="page-link text-secondary"
+                        style="background-color: rgb(52, 85, 107);"
+                    {% endif %}
                     aria-label="Next"
-                    style="background-color: dodgerblue; color: #fff;"    
                 >
-                    <span aria-hidden="true"> &gt;&gt; </span>
+                    <span aria-hidden="true">Next&gt;&gt; </span>
                 </a>
             </li>
         </ul>

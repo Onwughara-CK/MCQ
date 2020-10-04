@@ -11,11 +11,13 @@ from django.forms import formset_factory
 
 
 from .models import Quiz, Choice, Question
-from .forms import QuizForm, QuestionForm, ChoiceForm
+from .forms import QuizForm, QuestionForm, ChoiceForm, BaseChoiceFormSet
+from exam.views import clearSessionWithoutLoggingOut
 
 
 class DashView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        clearSessionWithoutLoggingOut(request)
         return render(request, 'dashboard/dash.html')
 
 
@@ -50,7 +52,7 @@ class QuizDeleteView(
     generic.edit.DeleteView
 ):
     model = Quiz
-    success_url = reverse_lazy('dash:quiz-list')
+    success_url = reverse_lazy('dash:quiz_list')
     success_message = 'Successfully Deleted quiz'
     context_object_name = 'object'
     template_name = "dashboard/dash_confirm_delete.html"
@@ -239,12 +241,12 @@ class CreateQuestionAndChoice(
     UserPassesTestMixin,
     generic.edit.FormView
 ):
-    ChoiceFormSet = formset_factory(ChoiceForm, extra=4, max_num=4)
+    ChoiceFormSet = formset_factory(ChoiceForm, extra=4, max_num=4, formset=BaseChoiceFormSet )
 
     def get(self, request, *args, **kwargs):
         context = {
             'form': QuestionForm(),
-            'ChoiceForm': self.ChoiceFormSet(),
+            'formset': self.ChoiceFormSet(),
         }
         return render(request, 'dashboard/create_quiz.html', context)
 
@@ -255,7 +257,7 @@ class CreateQuestionAndChoice(
 
         context = {
             'form': questionForm,
-            'ChoiceForm': formset,
+            'formset': formset,
         }
 
         if questionForm.is_valid() and formset.is_valid():

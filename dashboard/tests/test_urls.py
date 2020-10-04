@@ -24,13 +24,13 @@ class UrlTest(SimpleTestCase):
     ### QUIZ LIST VIEW ###
 
     def test_quiz_list_url_resolves_to_quiz_list_view(self):
-        url = reverse('dash:quiz-list')
+        url = reverse('dash:quiz_list')
         self.assertURLEqual(url, '/dashboard/quizzes/')
         self.assertEqual(resolve(url).func.view_class,
                          views.QuizListView)
 
     def test_quiz_list_url_fails_resolve_to__list_view(self):
-        url = reverse('dash:quiz-list')
+        url = reverse('dash:quiz_list')
         self.assertNotEqual(url, '/dashboard/')
         self.assertNotEqual(resolve(url).func.view_class,
                             views.DashView)

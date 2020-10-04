@@ -17,31 +17,31 @@
         </p>
     </div>
     <div class="row mt-5 justify-content-center">
-            {% if quiz %}
-                {% for question in quiz.questions.all %}
-                <table 
-                    class="table table-hover col-10 border-primary"
-                    style="background-color: #fff;"
-                >
-                    <thead >
-                        <tr>
-                            <th class="col-6 table-bordered">Question</th>
-                        </tr>
-                    </thead>
-                        <tbody>
-                            <tr class="">
-                                <td class="col-6 table-bordered"><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a></td>
-                                <td class="col-2 d-none d-sm-table-cell"><a href="{{ question.get_update_url }}">Update</a></td>
-                                <td class="col-2 d-none d-sm-table-cell"><a href="{{ question.get_delete_url }}">Delete</a></td>
-                            </tr>            
-                        </tbody>
-                {% empty %}
-                    <h1 class="text-center display-2">No Questions</h1>
-                {% endfor %}            
-            {% endif %}            
-            </table>         
-        </div>
+        {% if quiz %}
+            <table 
+                class="table table-hover col-sm-10 border-primary"
+                style="background-color: #fff;"
+            >
+                <thead >
+                    <tr>
+                        <th class="col-6 table-bordered">Question</th>
+                    </tr>
+                </thead>
+            {% for question in quiz.questions.all %}
+                <tbody>
+                    <tr class="">
+                        <td class="col-6 table-bordered"><a href="{{ question.get_absolute_url }}">{{ question.question_text }}</a></td>
+                        <td class="col-2 d-none d-sm-table-cell"><a href="{{ question.get_update_url }}">Update</a></td>
+                        <td class="col-2 d-none d-sm-table-cell"><a href="{{ question.get_delete_url }}">Delete</a></td>
+                    </tr>            
+                </tbody>
+            {% empty %}
+                <h1 class="text-center display-2">No Questions</h1>
+            {% endfor %} 
+            </table>
+        {% endif %}            
     </div>
+    
 {% endblock content %}
     
 

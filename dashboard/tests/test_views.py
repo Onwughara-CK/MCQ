@@ -77,11 +77,11 @@ class QuizListViewTest(TestCase):
     def setUp(self):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
-        self.response = self.client.get(reverse('dash:quiz-list'))
+        self.response = self.client.get(reverse('dash:quiz_list'))
 
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        response = self.client.get(reverse('dash:quiz-list'))
+        response = self.client.get(reverse('dash:quiz_list'))
         self.assertRedirects(response, '/login/?next=/dashboard/quizzes/')
         self.assertEqual(response.status_code, 302)
 
@@ -91,7 +91,7 @@ class QuizListViewTest(TestCase):
     def test_logged_in_but_not_correct_permission(self):
         self.client.login(
             email='student@test.com', password='asdf7890')
-        response = self.client.get(reverse('dash:quiz-list'))
+        response = self.client.get(reverse('dash:quiz_list'))
         self.assertEqual(response.status_code, 403)
 
     def test_returns_correct_template(self):
@@ -879,9 +879,9 @@ class CreateQuestionAndChoiceViewTest(TestCase):
     # test context for forms
     def test_context_object(self):
         self.assertTrue('form' in self.response_get.context)
-        self.assertTrue('ChoiceForm' in self.response_get.context)
+        self.assertTrue('formset' in self.response_get.context)
         # check that the no choice forms is 4
-        self.assertEqual(len(self.response_get.context['ChoiceForm']), 4)
+        self.assertEqual(len(self.response_get.context['formset']), 4)
 
     # test only question form is valid
     def test_one_form_valid(self):

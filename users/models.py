@@ -36,7 +36,9 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractUser):
     username = None
-    teacher = models.BooleanField(default=False)
+    teacher = models.BooleanField(default=False,
+                                    help_text='check to register as a teacher. Only teachers can create quizzes'
+                                )
     email = models.EmailField(max_length=255, unique=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

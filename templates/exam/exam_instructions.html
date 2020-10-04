@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="row mt-5 justify-content-center">
-    <div class="col-10">
+    <div class="col-sm-10">
         <div class="card">            
             <div class="card-body">
                 <h4 class="display-4">Instructions</h4>
@@ -19,7 +19,7 @@
                     limit.
                 </li>
                 <li class="list-group-item">
-                    This Quiz has a duration of {{ exam.duration }}
+                    This Quiz has a duration of {{ exam.duration }} (HH:MM:SS)
                 </li>
                 <li class="list-group-item"> 
                     You will get 10 percent for each correct answer. At the end of the Quiz, your total score will be
@@ -33,7 +33,7 @@
 </div>
 <div class="row mt-5 justify-content-center">
     <div class="col-10">
-        <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" id="exam_questions" href="{% url 'exam:exam-questions-list' exam.pk %}">Start Quiz</a>
+        <a class="btn mx-1 btn-success mb-1 flex-fill" id="start" href="{% url 'exam:exam-questions-list' exam.pk %}">Start Quiz</a>
         <input type="hidden" name="pk" value="{{ exam.pk }}">
         {% csrf_token %}
     </div>

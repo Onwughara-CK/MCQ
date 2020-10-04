@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block title %}
-Create
+    Create
 {% endblock title %}
 
 
@@ -13,144 +13,64 @@ Create
     <h1 class="display-3 mb-5">
         Quizoo
     </h1>
-    <form class="col-6" action="" method="post">
+    <form class="col-sm-8" method="post" novalidate>
         <h1 class="h3 mb-3 font-weight-normal">
-            {% if ChoiceForm %}
-            Create Question and Choices
+            {% if formset %}
+                Create Question and Choices
             {% else %}
-            Create Quiz
+                Create Quiz
             {% endif %}
         </h1>
         {% csrf_token %}
-        {% for field in form.visible_fields %}
-        <div class="form-group">
-            <label class="text-dark">{{field.label}}</label>
-            {% render_field field|attr:"class:form-control" %}
-        </div>
-        {% endfor %}
+        {% include 'includes/form.html' %}      
+        
 
         <!-- management form -->
-        {% for form in ChoiceForm.management_form %}
-            {{form}}
-        {% endfor %}
+        {{ formset.management_form }}            
 
-        <!-- choice form set -->
-        {% for form in ChoiceForm.forms %}
+        <!-- choice form set -->            
+        {% for form in formset.forms %}        
         {% with id=forloop.counter %}
         <div>
-            <fieldset class="form-group border border-gray rounded p-2 bg-white">
-                {% for field in form.visible_fields %}
-                <div class="form-group">
-                    <label class="text-dark">{{ field.label }} {{ id }}</label>
-                    {% render_field field|attr:"class:form-control" %}
+            {% if not formset.is_valid %}            
+                {% for error in formset.non_form_errors %}
+                <div class="from-group">
+                    <small class="text-danger">
+                        {{ error }}
+                    </small>
                 </div>
-                {% endfor %}
+                {% endfor %}                            
+            {% endif %}
+            <fieldset class="
+                {% if formset.is_bound %}       
+                    {% if not form.is_valid %} 
+                        border-danger                        
+                    {% endif %}
+                {% else %}
+                    border-gray
+                {% endif %}
+                form-group border  rounded p-2 bg-white
+            ">
+                {% include 'includes/form.html' %}
             </fieldset>
         </div>
         {% endwith %}
         {% endfor %}
         <div class="row justify-content-center" id="move">
-            <div class="col-6 d-flex justify-content-center" id="move1">
+            <div class="col-sm-6 d-flex flex-column flex-sm-row justify-content-center" id="move1">
                 {% csrf_token %}
                 <input class="btn mx-1 btn-success mb-1 flex-fill" id='finish' style="padding: .75rem 1.5rem;"
-                    type="submit" value="Finish" name="finish">
-                <input class="btn btn-success mb-1 flex-fill" id='continue' style="padding: .75rem 1.5rem;"
-                    type="submit" value="continue" name="continue">
+                    type="submit" value="Save and Exit" name="finish">
+                <input 
+                    class="btn btn-success mb-1 flex-fill" 
+                    id='continue' style="padding: .75rem 1.5rem;"
+                    type="submit" 
+                    value="Save and Create{% if formset %} Another{% endif %} Question" 
+                    name="continue"
+                >
             </div>
         </div>
     </form>
 </div>
 {% endblock content %}
 
-<!-- <div class="row flex-column justify-content-center align-items-center">
-    <h1 class="display-3 mb-5">
-        Quizoo
-    </h1>
-    <form class="col-6" action="" method="post">
-        <h1 class="h3 mb-3 font-weight-normal">
-            {% if ChoiceForm %}
-            Create Question and Choices
-            {% else %}
-            Create Quiz
-            {% endif %}
-        </h1>
-        {% csrf_token %}
-        {% for field in form.visible_fields %}
-        <div class="form-group">
-            <label class="text-dark">{{field.label}}</label>
-            {% render_field field|attr:"class:form-control" %}
-        </div>
-        {% endfor %}
-    </form>
-    {% for form in ChoiceForm.management_form %}
-        {{form}}
-    {% endfor %}
-    {% for form in ChoiceForm.forms %}
-    {% with id=forloop.counter %}
-    <div class="col-6">
-        <fieldset class="form-group border border-gray rounded p-2 bg-white">
-            {% for field in form.visible_fields %}
-            <div class="form-group">
-                <label class="text-dark">{{ field.label }} {{ id }}</label>
-                {% render_field field|attr:"class:form-control" %}
-            </div>
-            {% endfor %}
-        </fieldset>
-    </div>
-    {% endwith %}
-    {% endfor %}
-</div>
-<div class="row justify-content-center" id="move">
-    <div class="col-6 d-flex justify-content-center" id="move1">        
-            {% csrf_token %}
-            
-            <input class="btn mx-1 btn-success mb-1 flex-fill" id='finish' style="padding: .75rem 1.5rem;"
-                type="submit" value="Finish" name="finish">
-            <input class="btn btn-success mb-1 flex-fill" id='continue' style="padding: .75rem 1.5rem;"
-                type="submit" value="continue" name="continue">
-            </div>
-</div> -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" id='finish' href="{% url 'dash:quiz-list' %}">Save and
-            Finish</a>
-        <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" id='continue' href="">Save and Create Question</a> -->
-
-
-<!-- <form action="" method="post">
-    {% csrf_token %}
-    {% if ChoiceForm %}
-    {{QuestionForm.as_p}}
-    <hr>
-    {{ChoiceForm.as_p}}
-    {% else %}
-    {{ form.as_p }}
-    {% endif %}
-</form>
-<div id="move">
-    <a id='finish' href="{% url 'dash:quiz-list' %}">Save and Finish</a> |
-    <a id='continue' href="">Save and Create Question</a>
-</div> -->
-
-
-<!-- {% block js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<script src="{% static 'main.js' %}"></script>
-{% endblock js %} -->

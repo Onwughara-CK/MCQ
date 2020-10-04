@@ -11,7 +11,7 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='home'),
 
     # login
-    path('login/', auth_views.LoginView.as_view(template_name='users/login.html',
+    path('login/', auth_views.LoginView.as_view(template_name='users/authenticate.html',
                                                 redirect_authenticated_user=True,
                                                 extra_context={
                                                     'title': 'Login'}

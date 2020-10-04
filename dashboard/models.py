@@ -8,7 +8,7 @@ from django.urls import reverse
 class Quiz(models.Model):
     quiz_title = models.CharField(max_length=100)
     quiz_text = models.TextField()
-    duration = models.DurationField(default=timedelta(minutes=5))
+    duration = models.DurationField(default=timedelta(minutes=5), help_text='HH:MM:SS')
 
     def get_absolute_url(self):
         return reverse('dash:quiz-detail', args=[self.pk, ])
@@ -52,7 +52,11 @@ class Choice(models.Model):
     # users = models.ManyToManyField(
     #     get_user_model(), related_name='choices')
     mark = models.CharField(
-        max_length=5, choices=MARK, default='wrong')    
+        max_length=5, 
+        choices=MARK, 
+        default='wrong',
+        help_text='is this the right or wrong choice for this question? ',
+    )    
 
     def get_update_url(self):
         return reverse('dash:choice-update', args=[self.pk, ])

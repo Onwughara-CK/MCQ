@@ -28,7 +28,7 @@ class RegisterViewTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
 
     def test_returns_correct_template(self):
-        self.assertTemplateUsed(self.response, 'users/register.html')
+        self.assertTemplateUsed(self.response, 'users/authenticate.html')
 
     def test_context_object(self):
         self.assertIn('title', self.response.context)
@@ -40,7 +40,7 @@ class RegisterViewTest(TestCase):
     def test_invalid_data(self):
         response = self.client.post('/register/', {})
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'users/register.html')
+        self.assertTemplateUsed(response, 'users/authenticate.html')
 
     def test_valid_data(self):
         response = self.client.post('/register/', {
@@ -72,7 +72,7 @@ class LoginViewTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
 
     def test_returns_correct_template(self):
-        self.assertTemplateUsed(self.response, 'users/login.html')
+        self.assertTemplateUsed(self.response, 'users/authenticate.html')
 
     def test_user_is_redirect_if_authenticated(self):
         self.client.login(

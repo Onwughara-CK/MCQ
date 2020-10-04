@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <p>
+    <p class="d-flex justify-content-center">
         <a class="btn btn-outline-primary mr-1" href="{% url 'dash:quiz-questions' quiz.pk %}">
             See all Questions for this Quiz
         </a>
@@ -19,7 +19,7 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-10">
+    <div class="col-sm-10">
         {% if quiz %}
         <div class="card">
             <div class="card-header d-flex justify-content-center">

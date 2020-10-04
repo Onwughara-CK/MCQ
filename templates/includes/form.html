@@ -1,0 +1,60 @@
+{% load widget_tweaks %}
+
+
+{% for error in form.non_field_errors %}
+<div class="from-group">
+    <small class="text-danger">
+        {{ error }}
+    </small>
+</div>
+{% endfor %}
+    
+
+{% for field in form.visible_fields %}
+<div class="form-group">
+    {{ field.label_tag }} 
+    {% if formset %}
+        {{ id }}
+    {% endif %}
+        
+    {% if form.is_bound %}            
+        {% if field.errors or form.non_field_errors or formset.non_form_errors %}            
+        
+            {% if field.label == 'Teacher' %}
+                {% render_field field class="form-check-input is-invalid ml-3" %} 
+            {% else %}           
+                {% render_field field class="form-control is-invalid" %}       
+            {% endif %}
+
+            {% for error in field.errors %}
+                <div class="invalid-feedback">
+                    {{ error }}
+                </div>
+            {% endfor %}                  
+        {% else %}
+            
+
+            {% if field.label == 'Teacher' %}
+                {% render_field field class="form-check-input is-valid ml-3" %} 
+            {% else %}           
+                {% render_field field class="form-control is-valid" %}       
+            {% endif %}
+
+
+        {% endif %}
+    {% else %}
+    
+        {% if field.label == 'Teacher' %}
+            {% render_field field class="form-check-input ml-3" %} 
+        {% else %}           
+            {% render_field field class="form-control" %}       
+        {% endif %}
+        
+    {% endif %}
+    {% if field.help_text %}
+        <small class="form-text text-muted">
+            {{ field.help_text }}
+        </small>
+    {% endif %}                
+</div>
+{% endfor %}

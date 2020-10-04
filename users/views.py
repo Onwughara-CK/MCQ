@@ -20,13 +20,17 @@ class RegisterView(FormView):
             'form': form,
             'title': 'Register'
         }
-        return render(request, 'users/register.html', context)
+        return render(request, 'users/authenticate.html', context)
 
     def post(self, request):
         form = RegisterForm(request.POST)
+        context = {
+            'form': form,
+            'title': 'Register'
+        }
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
             login(request, user)
             return redirect(reverse('dash:dashboard'))
-        return render(request, 'users/register.html', {'form': form})
+        return render(request, 'users/authenticate.html', context)

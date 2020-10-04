@@ -5,9 +5,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import generic, View
 from django.http import JsonResponse, HttpResponse, Http404, HttpResponseNotFound
 from django.utils import timezone
-from django.utils.dateparse import parse_duration
+from django.core.exceptions import PermissionDenied
 
 from dashboard.models import Quiz, Choice, Question
+
+
+def clearSessionWithoutLoggingOut(request):
+    """clears session without logging user out"""
+    for key in list(request.session.keys()):
+        if not key.startswith('_'):
+            del request.session[key]
+    return
 
 
 class ExamListView(LoginRequiredMixin, generic.ListView):
@@ -15,25 +23,38 @@ class ExamListView(LoginRequiredMixin, generic.ListView):
     template_name = "exam/exam_list.html"
     context_object_name = 'exams'
 
+    def get(self, request, *args, **kwargs):
+        clearSessionWithoutLoggingOut(request)
+        return super().get(request, *args, **kwargs)
+
 
 class ExamInstructionsView(View):
     def get(self, request, *args, **kwargs):
+        clearSessionWithoutLoggingOut(request)
+        request.session['start-quiz'] = True
         if kwargs.get('sample'):
             exams = Quiz.objects.all()
             exam = random.choice(exams)
             if not exam:
-                HttpResponseNotFound('<h1>No quiz in Database. create at least one quiz to proceed<h1>')
+                return HttpResponseNotFound(
+                    '<h1>No quiz in Database. create at least one quiz to proceed<h1>')
         else:
             exam = get_object_or_404(Quiz, pk=kwargs['pk'])
         return render(request, 'exam/exam_instructions.html', {'exam': exam})
 
 
-class ExamQuestionsListView(generic.ListView):
+class ExamQuestionsListView(UserPassesTestMixin, generic.ListView):
     context_object_name = 'questions'
     template_name = 'exam/exam_questions.html'
     paginate_by = 1
 
-    def get_queryset(self):        
+    def test_func(self):
+        if self.request.session.get('start-quiz') != True:
+            clearSessionWithoutLoggingOut(self.request)
+            raise PermissionDenied
+        return True
+
+    def get_queryset(self):
         queryset = Quiz.objects.get(
             pk=self.kwargs['pk']).questions.all().order_by('question_text')
         return queryset
@@ -42,7 +63,6 @@ class ExamQuestionsListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['quiz_pk'] = self.kwargs['pk']
         return context
-
 
 class ExamResultView(View):
     def get(self, request):
@@ -58,14 +78,13 @@ class ExamResultView(View):
         for k, v in request.POST.items():
             request.session[k] = v
         if request.POST.get('finish'):
-            if request.is_ajax():
-                raise Http404
             correct_choices = Choice.objects.filter(
                 question__quiz__pk=request.POST.get('quiz_pk')).filter(mark='right')
             result = {
                 'no_of_questions': Quiz.objects.get(pk=request.POST.get('quiz_pk')).questions.count(),
                 'no_of_correct_choices_answered': 0,
                 'no_of_questions_answered': 0,
+                'pk':request.POST.get('quiz_pk')
             }
             corrections = {}
             corrections_list = []
@@ -90,30 +109,17 @@ class ExamResultView(View):
             result['corrections'] = corrections_list
             result['score_percent'] = int(result['no_of_correct_choices_answered'] /
                                           result['no_of_questions'] * 100)
-            for key in list(request.session.keys()):
-                if not key.startswith('_'):
-                    del request.session[key]
+            result['time_spent'] = request.POST.get('elapse')
+            clearSessionWithoutLoggingOut(request)
             return render(request, 'exam/result_sheet.html', result)
         return HttpResponse(status=204)
 
 
 class ExamTimerView(View):
-    timer = {}
-
-    def get(self, request):
+    def post(self, request):
         if not request.is_ajax():
             raise Http404
-        return HttpResponse(self.timer.get('deadline_in_ms'))
-
-    def post(self, request):
         exam_duration = get_object_or_404(
             Quiz, pk=request.POST.get('pk')).duration
-        delta = parse_duration(str(exam_duration))
+        return HttpResponse(str(exam_duration))
 
-        deadline = timezone.now() + delta
-        self.timer['deadline_in_ms'] = int(deadline.timestamp()*1000)
-        if not request.is_ajax():
-            raise Http404
-        return HttpResponse(self.timer.get('deadline_in_ms'))
-
-# class SampleExamView()

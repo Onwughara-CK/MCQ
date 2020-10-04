@@ -13,7 +13,7 @@
     </p>
 </div>
 <div class="row justify-content-center">
-    <div class="col-10">
+    <div class="col-sm-10">
         {% if question %}
         <div class="card">
             <div class="card-header d-flex justify-content-center">
@@ -50,17 +50,3 @@
     </div>
 </div>
 {% endblock content %}
-
-<!-- {% if question %}
-<p>{{ question.question_text }}</p>
-
-<p><a href="{{ question.get_delete_url }}">Delete</a>| <a href="{{ question.get_update_url }}">Update</a></p>
-<p> <b> Choices</b> </p>
-{% for choice in question.choices.all %}
-<p> {{ choice }}
-    <a href="{{ choice.get_update_url }}">Update</a>
-</p>
-{% endfor %}
-
-
-{% endif %} -->

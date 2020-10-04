@@ -180,13 +180,13 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.status_code, 204)
 
 
-    def test_logged_in_but_not_ajax(self):
+    def test_not_ajax(self):
         self.assertEqual(self.response.status_code, 404)
         # post
         response = self.client.post(reverse('exam:exam-result'))
         self.assertEqual(response.status_code, 204)
 
-    def test_logged_in_with_ajax_get(self):
+    def test_ajax_get(self):
         response = self.client.get(
             reverse('exam:exam-result'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
@@ -194,7 +194,7 @@ class ExamResultViewTest(TestCase):
         self.assertJSONEqual(response.content.decode(), {})
 
     # test post as ajax without finish
-    def test_logged_in_with_ajax_post_not_finish(self):
+    def test_ajax_post_not_finish(self):
         response = self.client.post(
             reverse('exam:exam-result'),
             data={},
@@ -202,7 +202,7 @@ class ExamResultViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
 
-    def test_logged_in_with_ajax_post_and_finish(self):
+    def test_ajax_post_and_finish(self):
         response = self.client.post(
             reverse('exam:exam-result'),
             data={
@@ -211,7 +211,7 @@ class ExamResultViewTest(TestCase):
             },
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
     def test_logged_in_without_ajax_post_but_finish(self):
         response = self.client.post(
@@ -245,10 +245,6 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.context['no_of_questions_answered'], 2)
         self.assertEqual(response.context['score_percent'], 20)
 
-
-# test ajax get and post
-# test quiz duration, create quiz and send pk
-# test 404 with wrong pk
 class ExamTimerViewTest(TestCase):
     """
     Test Exam Timer View
@@ -272,18 +268,11 @@ class ExamTimerViewTest(TestCase):
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(reverse('exam:timer'))
 
-    def test_not_ajax(self):
-        self.assertEqual(self.response.status_code, 404)
-        # post
+    def test_not_ajax(self):        
         response = self.client.post(reverse('exam:timer'))
         self.assertEqual(response.status_code, 404)
 
-    def test_with_ajax_get(self):
-        response = self.client.get(
-            reverse('exam:timer'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
-
-    def test_logged_in_with_ajax_post_with_invalid_data(self):
+    def test_ajax_post_with_invalid_data(self):
         response = self.client.post(
             reverse('exam:timer'),
             data={},
@@ -291,7 +280,7 @@ class ExamTimerViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    def test_logged_in_with_ajax_post_with_valid_data(self):
+    def test_ajax_post_with_valid_data(self):
         response = self.client.post(
             reverse('exam:timer'),
             data={

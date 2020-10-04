@@ -14,7 +14,7 @@
 {% block content %}
 
     <div class="row mt-5 justify-content-center">
-        <div class="col-10 text-center">
+        <div class="col-sm-10 text-center">
             <h1 class="display-4">Quizoo - Multi Choice Quiz App</h1>
             <p class="h3 font-weight-normal">
                 With Quizoo, practise and create MCQ/quizzes easily
@@ -30,7 +30,7 @@
             <div class="row mt-5 justify-content-center">
                 <div class="col-10 col-sm-8 d-flex justify-content-center flex-sm-row flex-column">
                     <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="{% url 'dash:create-quiz' %}" >Create Quiz</a>
-                    <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="{% url 'dash:quiz-list' %}" >See list of Quizzes</a>
+                    <a class="btn mx-1 btn-outline-primary mb-1 flex-fill" href="{% url 'dash:quiz_list' %}" >See list of Quizzes</a>
                 </div>
             </div>
         {% else %}
@@ -51,8 +51,3 @@
 
 {% endblock content %}
 
-<!-- <h3>
-    <a href="{% url 'dash:create-quiz' %}">Create Quiz</a> |
-    <a href="{% url 'dash:quiz-list' %}">Quiz List</a> |
-    <a href="{% url 'users:logout' %}">Logout</a>
-</h3> -->

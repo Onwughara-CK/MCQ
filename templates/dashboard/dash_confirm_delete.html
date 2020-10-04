@@ -6,7 +6,7 @@ Delete {{ object }}
 
 {% block content %}
     <div class="row justify-content-center">
-        <form class="form-signin col-10 border border-danger rounded" method="post">
+        <form class="form-signin col-sm-10 border border-danger rounded" method="post">
             {% csrf_token %}
             <h1 class="h3 mb-3 font-weight-normal">Are you sure you want to delete "{{ object }}"?</h1>
             <div class="form-group d-flex justify-content-center">

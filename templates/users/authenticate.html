@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+{% block content %}
+<div class="row flex-column justify-content-center align-items-center">
+    <h1 class="display-3 mb-5">
+        Quizoo
+    </h1>
+    <form class="form-signin" action="" method="post" novalidate>
+        <h1 class="h3 mb-3 font-weight-normal">Please Fill Form</h1>
+        {% csrf_token %}   
+        {% include 'includes/form.html' %}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+    </form>
+    <small class="text-danger">
+        
+        {% if title != 'Login' %}
+            Already have an account? <a href="{% url 'users:login' %}">Login</a>
+        {% else %}
+            Don't have an account? <a href="{% url 'users:register' %}">Register</a>
+        {% endif %}
+            
+    </small>
+</div>
+{% endblock content %}
