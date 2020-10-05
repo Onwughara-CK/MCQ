@@ -11,11 +11,24 @@ class IndexViewTest(TestCase):
         cls.client = Client()
         cls.response = cls.client.get('/')
 
+        # create User instance
+        cls.user = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
     def test_url_resolves_to_view(self):
         self.assertEqual(self.response.status_code, 200)
 
     def test_returns_correct_template(self):
         self.assertTemplateUsed(self.response, 'users/index.html')
+
+    def test_user_is_authenticated(self):
+        self.client.login(
+            email='student@test.com', password='asdf7890')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('dash:dashboard'))
+
+        
 
 
 class RegisterViewTest(TestCase):
@@ -79,6 +92,7 @@ class LoginViewTest(TestCase):
             email='student@test.com', password='asdf7890')
         response = self.client.get(reverse('users:login'))
         self.assertEqual(response.status_code, 302)
+        self.assertTrue(self.user.is_authenticated)
 
 
 class LogoutViewTest(TestCase):
@@ -93,9 +107,19 @@ class LogoutViewTest(TestCase):
         cls.user = get_user_model().objects.create_user(
             email='student@test.com', password='asdf7890')
 
-    def test_url_resolves_with_correct_status_code(self):
+    def setUp(self):
         self.client.login(
             email='student@test.com', password='asdf7890')
+
+    def test_url_resolves_with_correct_status_code(self):        
         response = self.client.get('/logout/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/')
+
+    def test_user_is_not_authenticated(self):
+        self.assertTrue(self.user.is_authenticated)
+        response = self.client.get('/dashboard/') #send request to confirm if user object in response
+        self.assertContains(response, 'user')
+        response = self.client.get('/logout/') # logs out to remove user from response
+        self.assertNotContains(response, 'user', status_code = 302)
+        

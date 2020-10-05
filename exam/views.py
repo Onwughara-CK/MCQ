@@ -33,11 +33,7 @@ class ExamInstructionsView(View):
         clearSessionWithoutLoggingOut(request)
         request.session['start-quiz'] = True
         if kwargs.get('sample'):
-            exams = Quiz.objects.all()
-            exam = random.choice(exams)
-            if not exam:
-                return HttpResponseNotFound(
-                    '<h1>No quiz in Database. create at least one quiz to proceed<h1>')
+            exam = get_object_or_404(Quiz, quiz_title='sample')            
         else:
             exam = get_object_or_404(Quiz, pk=kwargs['pk'])
         return render(request, 'exam/exam_instructions.html', {'exam': exam})

@@ -70,15 +70,28 @@ class ExamInstructionsViewTest(TestCase):
         ### create Quiz ###
         cls.quiz = models.Quiz.objects.create(
             quiz_title='title 1', quiz_text='text 1')
+        cls.sample_quiz = models.Quiz.objects.create(
+            quiz_title='sample', quiz_text='sample text')
 
     def setUp(self):
         self.client.login(
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(
-            reverse('exam:exam_instruction', args=[self.quiz.pk]))    
+            reverse('exam:exam_instruction', args=[self.quiz.pk]))
 
-    def test_logged_in_with_correct_permission(self):
+    def test_status_code(self):
         self.assertEqual(self.response.status_code, 200)
+
+    def test_404_for_wrong_pk(self):
+        response = self.client.get(
+            reverse('exam:exam_instruction', args=[911]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_sample_quiz(self):
+        response = self.client.get(
+            reverse('exam:sample_exam', args=['sample']))
+        self.assertEqual(response.context['exam'],self.sample_quiz)
+        
 
     def test_returns_correct_template(self):
         self.assertTemplateUsed(self.response, 'exam/exam_instructions.html')
@@ -108,26 +121,42 @@ class ExamQuestionsListViewTest(TestCase):
                 question_text=f'question text {i}', quiz=cls.quiz)
 
     def setUp(self):
-        self.client.login(
-            email='teacher@test.com', password='asdf7890')
-        self.response = self.client.get(
+        """
+        Responses for when a user types the exam questions url directly into the browser 
+        without passing through the instructions page
+        """
+        self.response_no_instruct_page = self.client.get(
+            reverse('exam:exam_questions_list', args=[self.quiz.pk]))
+        
+        self.client.get(
+            reverse('exam:exam_instruction', args=[self.quiz.pk]))
+        self.response_after_instruct_page = self.client.get(
             reverse('exam:exam_questions_list', args=[self.quiz.pk]))
 
-    def test_logged_in(self):
-        self.assertEqual(self.response.status_code, 200)
+    def test_access_exam_questions_without_passing_through_instructions_page(self):
+        """ 
+        When the instructions page of a quiz is loaded, a session variable of start-quiz
+        is created and equated to True. If a user tries to access the exam questions
+        without passing through the instruction page by typing the url of the exam
+        directly into the browser, a Permission Denied is raised with status code 403        
+        """
+        self.assertEqual(self.response_no_instruct_page.status_code, 403)       
+
+    def test_access_exam_questions_after_passing_through_instructions_page(self):        
+        self.assertEqual(self.response_after_instruct_page.status_code, 200)
 
     def test_returns_correct_template(self):
-        self.assertTemplateUsed(self.response, 'exam/exam_questions.html')
+        self.assertTemplateUsed(self.response_after_instruct_page, 'exam/exam_questions.html')
 
     def test_context_object(self):
-        self.assertEqual(self.response.context['quiz_pk'], self.quiz.pk)
-        self.assertIn('questions', self.response.context)
+        self.assertEqual(self.response_after_instruct_page.context['quiz_pk'], self.quiz.pk)
+        self.assertIn('questions', self.response_after_instruct_page.context)
 
     def test_pagination(self):
-        self.assertTrue(self.response.context['is_paginated'])
+        self.assertTrue(self.response_after_instruct_page.context['is_paginated'])
         self.assertEqual(
-            self.response.context['paginator'].count, self.quiz.questions.count())
-        self.assertEqual(self.response.context['paginator'].per_page, 1)
+            self.response_after_instruct_page.context['paginator'].count, self.quiz.questions.count())
+        self.assertEqual(self.response_after_instruct_page.context['paginator'].per_page, 1)
 
 
 class ExamResultViewTest(TestCase):
@@ -173,12 +202,11 @@ class ExamResultViewTest(TestCase):
     # test not login
     def test_guest_not_ajax(self):
         self.client.logout()
-        response = self.client.get(reverse('exam:exam_result'))        
+        response = self.client.get(reverse('exam:exam_result'))
         self.assertEqual(response.status_code, 404)
         # post
         response = self.client.post(reverse('exam:exam_result'))
         self.assertEqual(response.status_code, 204)
-
 
     def test_not_ajax(self):
         self.assertEqual(self.response.status_code, 404)
@@ -202,18 +230,18 @@ class ExamResultViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
 
-    def test_ajax_post_and_finish(self):
-        response = self.client.post(
-            reverse('exam:exam_result'),
-            data={
-                'finish': True,
-                'quiz_pk': self.quiz.pk,
-            },
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-        )
-        self.assertEqual(response.status_code, 200)
+    # def test_ajax_post_and_finish(self):
+    #     response = self.client.post(
+    #         reverse('exam:exam_result'),
+    #         data={
+    #             'finish': True,
+    #             'quiz_pk': self.quiz.pk,
+    #         },
+    #         HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+    #     )
+    #     self.assertEqual(response.status_code, 200)
 
-    def test_logged_in_without_ajax_post_but_finish(self):
+    def test_post_finish(self):
         response = self.client.post(
             reverse('exam:exam_result'),
             data={
@@ -228,7 +256,7 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.context['no_of_questions_answered'], 0)
         self.assertEqual(response.context['score_percent'], 0)
 
-    def test_logged_in_without_ajax_post_and_finish_with_correct_choices(self):
+    def test_post_and_finish_with_correct_choices(self):
         response = self.client.post(
             reverse('exam:exam_result'),
             data={
@@ -236,14 +264,33 @@ class ExamResultViewTest(TestCase):
                 'quiz_pk': self.quiz.pk,
                 'Question1': models.Choice.objects.filter(mark='right').first().pk,
                 'Question2': models.Choice.objects.filter(mark='right').last().pk,
+                'Question3': models.Choice.objects.filter(mark='wrong').last().pk,
             },
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'exam/result_sheet.html')
         self.assertEqual(response.context['no_of_questions'], 10)
         self.assertEqual(response.context['no_of_correct_choices_answered'], 2)
-        self.assertEqual(response.context['no_of_questions_answered'], 2)
+        self.assertEqual(response.context['no_of_questions_answered'], 3)
         self.assertEqual(response.context['score_percent'], 20)
+
+    def test_post_and_get(self):
+        data={                
+                'Question1': 1,
+                'Question2': 2,
+        }
+        self.client.post(
+            reverse('exam:exam_result'),
+            data,
+        )
+
+        response = self.client.get(reverse('exam:exam_result'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # receive json bytes, so decode byte to json and check
+        self.assertJSONEqual(response.content.decode(), {                
+                'Question1': '1',
+                'Question2': '2',
+        })
+
 
 class ExamTimerViewTest(TestCase):
     """
@@ -268,7 +315,7 @@ class ExamTimerViewTest(TestCase):
             email='teacher@test.com', password='asdf7890')
         self.response = self.client.get(reverse('exam:timer'))
 
-    def test_not_ajax(self):        
+    def test_not_ajax(self):
         response = self.client.post(reverse('exam:timer'))
         self.assertEqual(response.status_code, 404)
 
@@ -287,5 +334,5 @@ class ExamTimerViewTest(TestCase):
                 'pk': self.quiz.pk,
             },
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-        )        
+        )
         self.assertEqual(response.status_code, 200)

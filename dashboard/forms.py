@@ -31,7 +31,7 @@ class BaseChoiceFormSet(BaseFormSet):
 
     def clean(self):
         """Checks that no two choices have the same text."""
-        if any(self.errors):
+        if any(self.errors):#Don't bother if any form has an error
             return
         choices_text = []
         for form in self.forms:
