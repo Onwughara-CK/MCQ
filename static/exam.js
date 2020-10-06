@@ -13,6 +13,20 @@ $(function () {
   }
 
   var end = localStorage.getItem('end')
+
+
+  function success(response) {
+    for (var key in response) {
+      $('input[name=choice][value =' + response[key] + ']').prop(
+        'checked',
+        true
+      );
+      $('#top > #' + key).removeClass('bg-danger')
+      $('#top > #' + key).addClass('bg-success')
+    }
+  }
+
+
   var x = setInterval(() => {
     var now = new Date().getTime();
     var duration = end - now;
@@ -27,7 +41,7 @@ $(function () {
       ((hours < 10 ? '0' : '') + hours) + ':' + ((minutes < 10 ? '0' : '') + minutes) + ':' + ((seconds < 10 ? '0' : '') + seconds)
     );
 
-    if (minutes < 1 && seconds < 10){
+    if (minutes < 1 && seconds < 10) {
       $('span.badge').removeClass('badge-primary');
       $('span.badge').addClass('badge-danger');
     }
@@ -45,7 +59,7 @@ $(function () {
 
   $('#exam').on('change', function () {
     var selectedId = $('input[name=choice]:checked', '#exam').attr('id');
-    
+
     data = {
       [selectedId]: $('input[name=choice]:checked', '#exam').attr('value'),
       csrfmiddlewaretoken: $("input[name= 'csrfmiddlewaretoken']").val(),
@@ -55,19 +69,13 @@ $(function () {
       type: 'POST',
       url: '/exam/result/',
       data: data,
+      success: success,
     });
   });
 
   $.ajax({
     type: 'GET',
     url: '/exam/result/',
-    success: function (response) {
-      for (var key in response) {
-        $('input[name=choice][value =' + response[key] + ']').prop(
-          'checked',
-          true
-        );
-      }
-    },
+    success: success,
   });
 });

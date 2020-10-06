@@ -1,5 +1,3 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import resolve, reverse
 from django.test import SimpleTestCase, TestCase
 
@@ -21,7 +19,7 @@ class UrlTest(TestCase):
     def test_exam_url(self):
         self.assertEqual(resolve('/exam/').func.view_class,exam_views.ExamListView)
         self.assertEqual(resolve('/exam/').namespace,'exam')
-    
+
 
 
 

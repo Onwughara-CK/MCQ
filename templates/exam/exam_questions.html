@@ -5,14 +5,33 @@
     Exam
 {% endblock title %}
 
-#links == small boxes of questions indicating answered and not answered
-
-
 {% block navbar %}    
 {% endblock navbar %}   
 
 {% block content %}
-<span class="badge badge-primary py-0 fixed-top"><h2 id="timer">00:00:00</h2></span>
+<div class="row justify-content-center m-1">
+    Question {{ page_obj.number }} of {{ paginator.num_pages }}
+</div>
+<div class="row justify-content-center">
+    <span class="badge badge-primary py-0 fixed-top"><h2 id="timer">00:00:00</h2></span>    
+    <ul class="pagination col-sm-10 justify-content-center" style="padding-left: 15px !important;">
+    {% for page_num in paginator.page_range %}
+    
+        {% if page_obj.number == page_num %}
+            <li class="page-item active" id="top">
+                <span class="page-link border-0 text-white bg-danger" id="Question{{ page_num }}">
+                    {{ page_num }}
+                </span>            
+            </li>
+        {% else %}
+            <li class="page-item" id="top">
+                <a class="page-link border-0 text-white bg-danger" href="?page={{page_num}}" id="Question{{ page_num }}">{{page_num}}</a>
+            </li>
+        {% endif %} 
+        
+    {% endfor %}
+    </ul>        
+</div>
 <div class="row my-3 justify-content-center">    
     <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
     {% if questions %}
@@ -82,7 +101,7 @@
                         <input type="hidden" name="quiz_pk" value="{{ quiz_pk }}">
                         <input type="hidden" name="elapse" value="">
                     </form>
-                </li>
+                </li>                
                 <!-- abort button -->
                 <li class="page-item mx-1">
                     <a 

@@ -206,13 +206,13 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
         # post
         response = self.client.post(reverse('exam:exam_result'))
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 404)
 
     def test_not_ajax(self):
         self.assertEqual(self.response.status_code, 404)
         # post
         response = self.client.post(reverse('exam:exam_result'))
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 404)
 
     def test_ajax_get(self):
         response = self.client.get(
@@ -228,7 +228,9 @@ class ExamResultViewTest(TestCase):
             data={},
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(), {})
+
 
     # def test_ajax_post_and_finish(self):
     #     response = self.client.post(

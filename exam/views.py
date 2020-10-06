@@ -73,44 +73,45 @@ class ExamResultView(View):
     def post(self, request):
         for k, v in request.POST.items():
             request.session[k] = v
-        if request.POST.get('finish'):
-            correct_choices = Choice.objects.filter(
-                question__quiz__pk=request.POST.get('quiz_pk')).filter(mark='right')
-            result = {
-                'no_of_questions': Quiz.objects.get(pk=request.POST.get('quiz_pk')).questions.count(),
-                'no_of_correct_choices_answered': 0,
-                'no_of_questions_answered': 0,
-                'pk':request.POST.get('quiz_pk')
+        if not request.POST.get('finish'):
+            return self.get(request)
+        
+        # if request.POST.get('finish'):
+        correct_choices = Choice.objects.filter(
+            question__quiz__pk=request.POST.get('quiz_pk')).filter(mark='right')
+        result = {
+            'no_of_questions': Quiz.objects.get(pk=request.POST.get('quiz_pk')).questions.count(),
+            'no_of_correct_choices_answered': 0,
+            'no_of_questions_answered': 0,
+            'pk':request.POST.get('quiz_pk')
+        }
+        corrections = {}
+        corrections_list = []
+        for correct_choice in correct_choices:
+            corrections[correct_choice.question.pk] = {
+                'question': correct_choice.question.question_text,
+                'correct_choice': correct_choice.choice_text,
+                'your_choice': 'You Did not Answer This Question',
             }
-            corrections = {}
-            corrections_list = []
-            for correct_choice in correct_choices:
-                corrections[correct_choice.question.pk] = {
-                    'question': correct_choice.question.question_text,
-                    'correct_choice': correct_choice.choice_text,
-                    'your_choice': 'You Did not Answer This Question',
-                }
 
-            for question_id, your_choice_id in request.session.items():
-                if 'Question' in question_id:
-                    result['no_of_questions_answered'] += 1
-                    your_choice = Choice.objects.get(
-                        pk=your_choice_id)
-                    corrections[your_choice.question.pk]['your_choice'] = your_choice.choice_text
+        for question_id, your_choice_id in request.session.items():
+            if 'Question' in question_id:
+                result['no_of_questions_answered'] += 1
+                your_choice = Choice.objects.get(
+                    pk=your_choice_id)
+                corrections[your_choice.question.pk]['your_choice'] = your_choice.choice_text
 
-                    if your_choice in correct_choices:
-                        result['no_of_correct_choices_answered'] += 1
-            for _, v in corrections.items():
-                corrections_list.append(v)
-            result['corrections'] = corrections_list
-            result['score_percent'] = int(result['no_of_correct_choices_answered'] /
-                                          result['no_of_questions'] * 100)
-            result['time_spent'] = request.POST.get('elapse')
-            clearSessionWithoutLoggingOut(request)
-            return render(request, 'exam/result_sheet.html', result)
-        return HttpResponse(status=204)
-
-
+                if your_choice in correct_choices:
+                    result['no_of_correct_choices_answered'] += 1
+        for _, v in corrections.items():
+            corrections_list.append(v)
+        result['corrections'] = corrections_list
+        result['score_percent'] = int(result['no_of_correct_choices_answered'] /
+                                        result['no_of_questions'] * 100)
+        result['time_spent'] = request.POST.get('elapse')
+        clearSessionWithoutLoggingOut(request)
+        return render(request, 'exam/result_sheet.html', result)
+        
 class ExamTimerView(View):
     def post(self, request):
         if not request.is_ajax():
