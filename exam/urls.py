@@ -17,4 +17,6 @@ urlpatterns = [
          name='exam_result'),
     path('timer/', views.ExamTimerView.as_view(),
          name='timer'),
+    path('resultList/', views.ExamResultListView.as_view(),
+         name='result_list'),
 ]

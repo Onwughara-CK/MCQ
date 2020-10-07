@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 
 from dashboard import models
+from exam import models as exam_models
 
 
 class ExamListViewTest(TestCase):
@@ -231,18 +232,6 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content.decode(), {})
 
-
-    # def test_ajax_post_and_finish(self):
-    #     response = self.client.post(
-    #         reverse('exam:exam_result'),
-    #         data={
-    #             'finish': True,
-    #             'quiz_pk': self.quiz.pk,
-    #         },
-    #         HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-    #     )
-    #     self.assertEqual(response.status_code, 200)
-
     def test_post_finish(self):
         response = self.client.post(
             reverse('exam:exam_result'),
@@ -338,3 +327,56 @@ class ExamTimerViewTest(TestCase):
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
         self.assertEqual(response.status_code, 200)
+
+
+class ExamResultListViewTest(TestCase):
+    """
+    Test Exam Result List View
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+    ### create student ###
+        cls.student = get_user_model().objects.create_user(
+            email='student@test.com', password='asdf7890')
+
+        for i in range(1, 5):
+            exam_models.Result.objects.create(
+                percentage=i**2, 
+                time_spent=timedelta(minutes=i*2),
+                failed = 2,
+                passed = 4,
+                no_of_questions = 6,
+                user = cls.student
+            )
+
+    def setUp(self):
+        self.client.login(
+            email='student@test.com', password='asdf7890')
+        self.response = self.client.get(
+            reverse('exam:result_list')
+        )
+
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(reverse('exam:result_list'))
+        self.assertRedirects(
+            response, '/login/?next=/exam/resultList/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in(self):
+        self.assertEqual(self.response.status_code, 200)
+
+    def test_returns_correct_template(self):
+        self.assertTemplateUsed(
+            self.response, 'exam/result_list.html')
+
+    def test_context_object(self):
+        self.assertIn('results',self.response.context)
+        self.assertCountEqual(
+            self.response.context['results'], self.response.context['user'].results.all())
+
+
+
+

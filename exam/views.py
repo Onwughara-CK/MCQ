@@ -1,5 +1,3 @@
-import random
-
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import generic, View
@@ -16,7 +14,6 @@ def clearSessionWithoutLoggingOut(request):
         if not key.startswith('_'):
             del request.session[key]
     return
-
 
 class ExamListView(LoginRequiredMixin, generic.ListView):
     model = Quiz
@@ -63,16 +60,16 @@ class ExamQuestionsListView(UserPassesTestMixin, generic.ListView):
 class ExamResultView(View):
     def get(self, request):
         data = {}
-        for k, v in request.session.items():
-            if "Question" in k:
-                data[k] = v
+        for key, value in request.session.items():
+            if "Question" in key:
+                data[key] = value
         if not request.is_ajax():
             raise Http404
         return JsonResponse(data)
 
     def post(self, request):
-        for k, v in request.POST.items():
-            request.session[k] = v
+        for key, value in request.POST.items():
+            request.session[key] = value
         if not request.POST.get('finish'):
             return self.get(request)
         
@@ -103,8 +100,8 @@ class ExamResultView(View):
 
                 if your_choice in correct_choices:
                     result['no_of_correct_choices_answered'] += 1
-        for _, v in corrections.items():
-            corrections_list.append(v)
+        for _, value in corrections.items():
+            corrections_list.append(value)
         result['corrections'] = corrections_list
         result['score_percent'] = int(result['no_of_correct_choices_answered'] /
                                         result['no_of_questions'] * 100)
@@ -119,4 +116,12 @@ class ExamTimerView(View):
         exam_duration = get_object_or_404(
             Quiz, pk=request.POST.get('pk')).duration
         return HttpResponse(str(exam_duration))
+
+class ExamResultListView(LoginRequiredMixin, generic.ListView):
+    template_name = 'exam/result_list.html'
+    context_object_name = 'results'
+
+    def get_queryset(self):
+        queryset = self.request.user.results.all()
+        return queryset
 

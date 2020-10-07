@@ -47,3 +47,9 @@ class UrlTest(SimpleTestCase):
         self.assertURLEqual(url, '/exam/sample/instructions/')
         self.assertEqual(resolve(url).func.view_class,
                          views.ExamInstructionsView)
+
+    def test_result_url_resolves_to_result_view(self):
+        url = reverse('exam:result_list')
+        self.assertURLEqual(url, '/exam/resultList/')
+        self.assertEqual(resolve(url).func.view_class,
+                         views.ExamResultListView)

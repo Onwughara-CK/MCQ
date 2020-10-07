@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.test import TestCase, Client
-from django.db import models as django_models
+# from django.db import models as django_models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
