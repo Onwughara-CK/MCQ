@@ -4,8 +4,10 @@ from django.views import generic, View
 from django.http import JsonResponse, HttpResponse, Http404, HttpResponseNotFound
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from django.utils.dateparse import parse_duration
 
 from dashboard.models import Quiz, Choice, Question
+from .models import Result
 
 
 def clearSessionWithoutLoggingOut(request):
@@ -80,7 +82,7 @@ class ExamResultView(View):
             'no_of_questions': Quiz.objects.get(pk=request.POST.get('quiz_pk')).questions.count(),
             'no_of_correct_choices_answered': 0,
             'no_of_questions_answered': 0,
-            'pk':request.POST.get('quiz_pk')
+            'pk':request.POST.get('quiz_pk'),
         }
         corrections = {}
         corrections_list = []
@@ -103,10 +105,20 @@ class ExamResultView(View):
         for _, value in corrections.items():
             corrections_list.append(value)
         result['corrections'] = corrections_list
-        result['score_percent'] = int(result['no_of_correct_choices_answered'] /
+        result['percentage'] = int(result['no_of_correct_choices_answered'] /
                                         result['no_of_questions'] * 100)
         result['time_spent'] = request.POST.get('elapse')
         clearSessionWithoutLoggingOut(request)
+        if request.user.is_authenticated:
+            Result.objects.create(
+                percentage= result['percentage'],
+                user = request.user,
+                time_spent = parse_duration(result['time_spent']),
+                no_of_questions_answered = result['no_of_questions_answered'],
+                no_of_correct_choices_answered = result['no_of_correct_choices_answered'],
+                no_of_questions = result['no_of_questions'],
+                quiz = Quiz.objects.get(pk=request.POST.get('quiz_pk')),
+            )
         return render(request, 'exam/result_sheet.html', result)
         
 class ExamTimerView(View):

@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.utils.dateparse import parse_duration
 from django.contrib.messages import get_messages
 
 from dashboard import models
@@ -176,7 +177,10 @@ class ExamResultViewTest(TestCase):
 
         ### create Quiz ###
         cls.quiz = models.Quiz.objects.create(
-            quiz_title='title 1', quiz_text='text 1')
+            quiz_title='title 1', 
+            quiz_text='text 1',
+            
+        )
 
         ### create 10 questions and for choices for each question ###
         for i in range(1, 11):
@@ -238,6 +242,7 @@ class ExamResultViewTest(TestCase):
             data={
                 'finish': True,
                 'quiz_pk': self.quiz.pk,
+                'elapse':parse_duration('00:05:00'),
             },
         )
         self.assertEqual(response.status_code, 200)
@@ -245,13 +250,14 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.context['no_of_questions'], 10)
         self.assertEqual(response.context['no_of_correct_choices_answered'], 0)
         self.assertEqual(response.context['no_of_questions_answered'], 0)
-        self.assertEqual(response.context['score_percent'], 0)
+        self.assertEqual(response.context['percentage'], 0)
 
     def test_post_and_finish_with_correct_choices(self):
         response = self.client.post(
             reverse('exam:exam_result'),
             data={
                 'finish': True,
+                'elapse':parse_duration('00:05:00'),
                 'quiz_pk': self.quiz.pk,
                 'Question1': models.Choice.objects.filter(mark='right').first().pk,
                 'Question2': models.Choice.objects.filter(mark='right').last().pk,
@@ -263,7 +269,7 @@ class ExamResultViewTest(TestCase):
         self.assertEqual(response.context['no_of_questions'], 10)
         self.assertEqual(response.context['no_of_correct_choices_answered'], 2)
         self.assertEqual(response.context['no_of_questions_answered'], 3)
-        self.assertEqual(response.context['score_percent'], 20)
+        self.assertEqual(response.context['percentage'], 20)
 
     def test_post_and_get(self):
         data={                
@@ -281,6 +287,20 @@ class ExamResultViewTest(TestCase):
                 'Question1': '1',
                 'Question2': '2',
         })
+
+    def test_post_finish_not_authenticated(self):
+        self.client.logout()
+        response = self.client.post(
+            reverse('exam:exam_result'),
+            data={
+                'finish': True,
+                'quiz_pk': self.quiz.pk,
+                'elapse':parse_duration('00:05:00'),
+            },
+        )
+        self.assertTemplateUsed(response, 'exam/result_sheet.html')
+        self.assertEqual(response.status_code, 200)
+        
 
 
 class ExamTimerViewTest(TestCase):
@@ -341,14 +361,18 @@ class ExamResultListViewTest(TestCase):
         cls.student = get_user_model().objects.create_user(
             email='student@test.com', password='asdf7890')
 
+        cls.quiz = models.Quiz.objects.create(
+            quiz_title='title 1', quiz_text='text 1', duration=timedelta(minutes=25))
+
         for i in range(1, 5):
             exam_models.Result.objects.create(
                 percentage=i**2, 
                 time_spent=timedelta(minutes=i*2),
-                failed = 2,
-                passed = 4,
+                no_of_questions_answered = 2,
+                no_of_correct_choices_answered = 4,
                 no_of_questions = 6,
-                user = cls.student
+                user = cls.student,
+                quiz = cls.quiz
             )
 
     def setUp(self):
