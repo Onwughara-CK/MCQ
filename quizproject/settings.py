@@ -16,7 +16,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def get_env_variable(var_name):
     """ Get the environment variables or return exception"""
@@ -38,11 +37,9 @@ SECRET_KEY = get_env_variable('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 if ENV_ROLE == 'development':
     DEBUG = True
-    TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
 
@@ -149,15 +146,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # LOGIN
-
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
