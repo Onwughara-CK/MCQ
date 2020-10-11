@@ -44,7 +44,7 @@ if ENV_ROLE == 'development':
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
 
 AUTH_USER_MODEL = 'users.User'
 
