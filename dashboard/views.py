@@ -157,14 +157,7 @@ class QuizQuestionsListView(
     context_object_name = 'quiz'
 
     def get_queryset(self):
-        # return Quiz.objects.get(pk=self.kwargs['pk']).questions.all()
-        return Quiz.objects.get(pk=self.kwargs['pk'])
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['quiz_title'] = Quiz.objects.get(
-    #         pk=self.kwargs['pk']).quiz_title
-    #     return context
+        return Quiz.objects.get(pk=self.kwargs['pk'])    
 
     def test_func(self):
         user = self.request.user
@@ -220,10 +213,7 @@ class CreateQuiz(
                 messages.success(
                     request, 'SuccessFully Created Quiz')
                 return redirect(reverse('dash:quiz_detail', args=[quiz.pk]))
-                # return HttpResponse(status=302)
             if request.POST.get('continue'):
-                # return HttpResponse(quiz.pk)
-                # return redirect(reverse('dash:create_question_answer'), permanent=True)
                 messages.success(
                     request, 'SuccessFully Created Quiz, Create Question and Choices')
                 return redirect(reverse('dash:create_question_choice', args=[quiz.pk]))
@@ -278,8 +268,6 @@ class CreateQuestionAndChoice(
                     request,
                     f'SuccessFully Created Question and Choices. Create another for {quiz.quiz_title}'
                 )
-                # return HttpResponse(quiz.pk)
-                # return render(request, 'dashboard/create_quiz.html', self.context)
                 return redirect(reverse('dash:create_question_choice', args=[quiz.pk]))
         return render(request, 'dashboard/create_quiz.html', context)
 

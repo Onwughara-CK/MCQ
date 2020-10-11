@@ -74,8 +74,6 @@ class ExamResultView(View):
             request.session[key] = value
         if not request.POST.get('finish'):
             return self.get(request)
-        
-        # if request.POST.get('finish'):
         correct_choices = Choice.objects.filter(
             question__quiz__pk=request.POST.get('quiz_pk')).filter(mark='right')
         result = {
@@ -92,14 +90,12 @@ class ExamResultView(View):
                 'correct_choice': correct_choice.choice_text,
                 'your_choice': 'You Did not Answer This Question',
             }
-
         for question_id, your_choice_id in request.session.items():
             if 'Question' in question_id:
                 result['no_of_questions_answered'] += 1
                 your_choice = Choice.objects.get(
                     pk=your_choice_id)
                 corrections[your_choice.question.pk]['your_choice'] = your_choice.choice_text
-
                 if your_choice in correct_choices:
                     result['no_of_correct_choices_answered'] += 1
         for _, value in corrections.items():
