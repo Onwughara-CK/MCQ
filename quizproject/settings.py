@@ -41,8 +41,8 @@ DEBUG = False
 if ENV_ROLE == 'development':
     DEBUG = True
 
-# ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
+# ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'users.User'
 
