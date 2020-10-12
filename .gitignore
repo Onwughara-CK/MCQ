@@ -130,3 +130,4 @@ dmypy.json
 todo.txt 
 # setup.cfg 
 .vscode 
+db.sqlite3 
