@@ -14,33 +14,38 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+import dj_database_url
+import django_heroku
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
-def get_env_variable(var_name):
-    """ Get the environment variables or return exception"""
-    try:
-        return os.environ[var_name]
-    except KeyError:
-        error_msg = f"Set the {var_name} environment variable"
-        raise ImproperlyConfigured(error_msg)
+# def get_env_variable(var_name):
+#     """ Get the environment variables or return exception"""
+#     try:
+#         return os.environ[var_name]
+#     except KeyError:
+#         error_msg = f"Set the {var_name} environment variable"
+#         raise ImproperlyConfigured(error_msg)
 
 # Get ENV VARIABLE key
-ENV_ROLE = get_env_variable('ENV_ROLE')
+# ENV_ROLE = get_env_variable('ENV_ROLE')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_variable('SECRET_KEY')
+# SECRET_KEY = get_env_variable('SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', "cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-if ENV_ROLE == 'development':
-    DEBUG = True
+# if ENV_ROLE == 'development':
+#     DEBUG = True
 
-ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1','.herokuapp.com']
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -156,3 +161,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
+
+django_heroku.settings(locals())
