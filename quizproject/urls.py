@@ -24,7 +24,3 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls', namespace='dash')),
     path('exam/', include('exam.urls', namespace='exam')),
 ]
-
-# if settings.DEBUG:
-#     urlpatterns += static(settings.STATIC_URL,
-#                           document_root=settings.STATIC_ROOT)    
