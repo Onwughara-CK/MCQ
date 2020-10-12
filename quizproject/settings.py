@@ -40,8 +40,7 @@ DEBUG = False
 if ENV_ROLE == 'development':
     DEBUG = True
 
-# ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['quizoo-app.herokuapp.com']
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -150,7 +149,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # LOGIN
