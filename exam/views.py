@@ -130,6 +130,6 @@ class ExamResultListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'results'
 
     def get_queryset(self):
-        queryset = self.request.user.results.all()
+        queryset = self.request.user.results.all().order_by('-date')
         return queryset
 
