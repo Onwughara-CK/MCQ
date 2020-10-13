@@ -7,7 +7,6 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  - python manage collectstatic
   - python manage.py test
   - coverage run --source=. --omit=manage.py --rcfile=setup.cfg manage.py test
 after_success: coveralls
